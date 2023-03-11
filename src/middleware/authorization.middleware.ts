@@ -51,8 +51,7 @@ export class AuthorizationMiddleware {
 
             try {
                 const userService = Container.get(UserServices)
-                const user = await userService.findOne(decryptToken.id);
-                console.log(user)
+                const user = await userService.findUser(decryptToken.id);
                 req.user = user;
                 next()
             } catch (error) {

@@ -3,25 +3,54 @@ import { Request, Response, NextFunction } from "express";
 import routes from "../route/user.routes";
 import UserServices from "../services/user.services";
 import { Inject } from "typedi";
+import ProfileServices from "../services/profile.services";
+import ProfileImageServices from "../services/profileImage.services";
 
 export default class UserController extends Controller {
     protected routes: APIRoute[];
     private readonly userServices: UserServices;
+    private readonly profileService: ProfileServices;
+    private readonly profileImageService: ProfileImageServices;
 
-    constructor(path: string, @Inject() userServices: UserServices) {
+    constructor(
+        path: string,
+        @Inject() userServices: UserServices,
+        @Inject() profileService: ProfileServices,
+        @Inject() profileImageService: ProfileImageServices
+
+    ) {
         super(path);
         this.userServices = userServices;
+        this.profileService = profileService;
+        this.profileImageService = profileImageService
         this.routes = routes(this);
     }
+
+
+    async createUserProfileHandler(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+
+            const id = req.user?.id;
+
+            await this.profileService.create(id!, req.body)
+
+            super.setResponseSuccess({
+                res,
+                status: 201,
+                message: "user profile are created"
+            })
+
+        } catch (error) {
+            next(error)
+        }
+    };
 
     async userImageHandler(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
 
             const id = req.user?.id;
-            // console.log(req.file, id);
 
-            const image = await this.userServices.userImage(req.file?.filename!, id!)
-
+            const image = await this.profileImageService.userImage(req.file?.filename!, id!)
 
             super.setResponseSuccess({
                 res,
@@ -39,7 +68,7 @@ export default class UserController extends Controller {
 
             const id = req.user?.id;
 
-            await this.userServices.delEteUserImage(id!)
+            await this.profileImageService.delEteUserImage(id!)
 
             super.setResponseSuccess({
                 res,
@@ -50,75 +79,42 @@ export default class UserController extends Controller {
             next(error)
         }
     };
-    // async getUserHandler(req:Request , res:Response , next:NextFunction) :  Promise<void> {
-    //     try {
 
-    //         const id = req.user?.id;
+    async getUserHandler(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
 
-    //         const userServices = new UserServices();
+            const id = req.user?.id;
 
-    //         const user = await userServices.findOne({id});
+            const data = await this.userServices.findOne({ id });
 
-    //         const {password:pass , ...others} = user
+            const { password: pass, ...user } = data
 
-    //         super.setResponseSuccess({res , status:200 , data:{
-    //             user:others
-    //         } })
+            super.setResponseSuccess({
+                res, status: 200, data: {
+                    user
+                }
+            })
 
-    //     } catch (error) {
-    //         next(error)
-    //     }
-    // };
+        } catch (error) {
+            next(error)
+        }
+    };
 
-    // async updateUserHandler(req:Request , res:Response , next:NextFunction) :  Promise<void> {
-    //     try {
+    async updateUserHandler(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
 
-    //         const id = req.user?.id;
+            const id = req.user?.id;
 
-    //         const data = req.body;
+            const { username, email, ...profile } = req.body;
 
-    //         const userServices = new UserServices();
+            await this.profileService.update(id!, profile)
 
-    //         const {password , ...user} = await userServices.update(id! , data)
+            const { password, ...user } = await this.userServices.update(id!, { username, email })
 
-    //         super.setResponseSuccess({res , status:200 , message:"user updated successfully" , data:{user}})
+            super.setResponseSuccess({ res, status: 200, message: "user updated successfully", data: { user } })
 
-    //     } catch (error) {
-    //         next(error)
-    //     }
-    // };
-
-    // async updateBrushTypeHandler(req:Request , res:Response , next:NextFunction) :  Promise<void> {
-    //     try {
-
-    //         const id = req.user?.id;
-
-    //         const brush_type = req.body.brush_type;
-
-    //         const userServices = new UserServices();
-
-    //         await userServices.brushTypeUpdate(id! , brush_type)
-
-    //         super.setResponseSuccess({res , status:200 , message:"brush type updated successfully"})
-
-    //     } catch (error) {
-    //         next(error)
-    //     }
-    // };
-
-    // async restPasswordHandler(req:Request , res:Response , next:NextFunction) :  Promise<void> {
-    //     try {
-
-    //         const id = req.user?.id;
-
-    //         const userServices = new UserServices();
-
-    //         await userServices.changePassword(id! , req.body.password , req.body.new_password)
-
-    //         super.setResponseSuccess({res , status:200 , message:"password is updated successfully"})
-
-    //     } catch (error) {
-    //         next(error)
-    //     }
-    // }
+        } catch (error) {
+            next(error)
+        }
+    };
 }

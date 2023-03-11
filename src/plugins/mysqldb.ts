@@ -23,7 +23,12 @@ export default abstract class KnexRepository<T> implements BaseRepository<T> {
         this.db = db;
     }
     public qb(): Knex.QueryBuilder {
-        return this.db(this.tableName)
+        try {
+            return this.db(this.tableName)
+        } catch (error) {
+            console.log(error)
+            throw setError(500, "database failure")
+        }
     }
 
 

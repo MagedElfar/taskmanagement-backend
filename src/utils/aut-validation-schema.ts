@@ -1,7 +1,5 @@
 import Joi from "joi";
 
-//auth
-
 const signupSchema = Joi.object({
 
     username: Joi.string()
