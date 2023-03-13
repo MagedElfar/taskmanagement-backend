@@ -9,11 +9,8 @@ export default class NodeMailerServices {
         return nodemailer.createTransport({
             service: "gmail",
             auth: {
-                user: config.nodemailer.user,
-                pass: config.nodemailer.password,
-                // clientId: config.nodemailer.clientId,
-                // clientSecret: config.nodemailer.clientSecret,
-                // refreshToken: config.nodemailer.refreshToken
+                user: config.google.user,
+                pass: config.google.password,
             },
             tls: { rejectUnauthorized: false }
 

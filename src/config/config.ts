@@ -38,12 +38,12 @@ const conf = {
     }
   },
 
-  nodemailer: {
-    user: process.env.NODEMAILER_USER,
-    password: process.env.NODEMAILER_PASSWORD,
-    clientId: process.env.NODEMAILER_CLIENT_ID,
-    clientSecret: process.env.NODEMAILER_CLIENT_SECRET,
-    refreshToken: process.env.NODEMAILER_REFRESH_TOKEN
+  google: {
+    user: process.env.GOOGLE_USER,
+    password: process.env.GOOGLE_PASSWORD,
+    clientId: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    refreshToken: process.env.GOOGLE_REFRESH_TOKEN
   },
 
   cloud: {

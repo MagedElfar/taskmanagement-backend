@@ -1,9 +1,8 @@
 import Model from "../app/model";
-import BaseRepository from "../plugins/mysqldb";
+import BaseRepository, { oneToManyMapped } from "../plugins/mysqldb";
 import { Service } from "typedi";
 import { setError } from "../utils/error-format";
-import knex from "knex";
-import db from "../database";
+
 
 export interface IUser extends Model {
     username: string;
@@ -30,6 +29,30 @@ export class UserRepository extends BaseRepository<IUser>{
         }
     }
 
+    async findWithTeam(id: number | Partial<IUser>) {
+        try {
+            const q = this.qb()
+                .select("users.*", "teams.*")
+                .leftJoin("teams", "teams.userId", "=", "users.id")
+                .options({ nestTables: true })
+
+            const user = typeof id === 'number'
+                ? q.where('users.id', id)
+                : q.where(id)
+
+
+            return await q.then((result) => {
+                return oneToManyMapped(result, "users", {
+                    teams: "oneToMany"
+                })
+            })
+        } catch (error) {
+            console.log(error)
+            throw setError(500, "database failure")
+        }
+    }
+
+
     async findOne(id: number | Partial<IUser>): Promise<IUser> {
         try {
             const query = this.db(this.tableName)
@@ -40,22 +63,13 @@ export class UserRepository extends BaseRepository<IUser>{
                 ? query.where('users.id', id)
                 : Object.keys(id).includes("id") ? query.where({ "users.id": id.id }) : query.where(id)
 
-            return query.first().options({ nestTables: true })
+            return query
+                .options({ nestTables: true })
                 .then(res => {
-                    if (res) {
-                        const user = {}
-
-                        Object.keys(res).forEach((key: string) => {
-                            if (key === "users") return Object.assign(user, { ...res[key] });
-
-                            if (res[key]?.id) return Object.assign(user, { [key]: res[key] });
-                        })
-
-                        return user
-                    }
-
-                    return res
-
+                    return oneToManyMapped(res, "users", {
+                        profile: "oneToOne",
+                        image: "oneToOne"
+                    })
                 })
 
         } catch (error) {

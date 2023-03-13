@@ -1,6 +1,6 @@
 import Controller, { APIRoute } from "../app/controller";
 import { Request, Response, NextFunction } from "express";
-import routes from "../route/user.routes";
+import routes from "../route/_user.routes";
 import UserServices from "../services/user.services";
 import { Inject } from "typedi";
 import ProfileServices from "../services/profile.services";
@@ -90,7 +90,8 @@ export default class UserController extends Controller {
             const { password: pass, ...user } = data
 
             super.setResponseSuccess({
-                res, status: 200, data: {
+                res, status: 200,
+                data: {
                     user
                 }
             })

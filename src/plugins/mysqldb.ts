@@ -1,6 +1,36 @@
 import db from "../database";
 import type { Knex } from 'knex'
 import { setError } from "../utils/error-format";
+import { object } from "joi";
+
+export function oneToManyMapped(arr: any[], target: string, relation: any) {
+
+    if (!arr.length) return null
+
+    const user = arr.reduce((obj, item, index) => {
+        if (index === 0) {
+            const targetObj = item[target];
+            obj = {
+                ...targetObj
+            }
+        }
+
+        delete item[target];
+
+        Object.keys(relation).forEach(key => {
+            if (relation[key] === "oneToOne") {
+                !obj[key] ? Object.assign(obj, { [key]: { ...item[key] } }) : obj
+            } else {
+                !obj[key] ? Object.assign(obj, { [key]: [item[key]] }) : obj[key] = [...obj[key], item[key]]
+            }
+        })
+
+
+        return obj
+    }, {})
+
+    return user;
+}
 
 interface Writer<T> {
     create(item: Omit<T, 'id'>): Promise<T>
@@ -8,7 +38,7 @@ interface Writer<T> {
     delete(id: number): Promise<boolean>
 }
 interface Reader<T> {
-    find(item: Partial<T>): Promise<T[]>
+    find(item: Partial<T>, option: any): Promise<any>;
     findOne(id: number | Partial<T>): Promise<T>
 }
 
@@ -45,9 +75,14 @@ export default abstract class KnexRepository<T> implements BaseRepository<T> {
 
     async update(id: number, item: Partial<T>): Promise<T> {
         try {
+            const updated_at = new Date()
+
             await this.qb()
                 .where('id', id)
-                .update(item)
+                .update({
+                    ...item,
+                    updated_at
+                })
 
             const data = await this.findOne(id);
 
@@ -68,17 +103,18 @@ export default abstract class KnexRepository<T> implements BaseRepository<T> {
             console.log(error)
             throw setError(500, "database failure")
         }
-    }
+    };
 
-    async find(item: Partial<T>): Promise<T[]> {
-        try {
-            return this.qb()
-                .where(item)
-                .select()
-        } catch (error) {
-            console.log(error)
-            throw setError(500, "database failure")
-        }
+
+    async find(item: Partial<T>, option?: any): Promise<any> {
+        // try {
+        //     return this.qb()
+        //         .where(item)
+        //         .select()
+        // } catch (error) {
+        //     console.log(error)
+        //     throw setError(500, "database failure")
+        // }
     }
 
     async findOne(id: number | Partial<T>): Promise<T> {

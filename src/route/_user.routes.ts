@@ -1,7 +1,7 @@
 import Controller, { APIRoute, Methods } from '../app/controller';
 import Multer from '../middleware/multer.middleware';
-import { profileSchema, updateUserSchema } from '../utils/user-validation-schema';
-import validation from "./../middleware/validation.middleware"
+import { profileSchema, updateUserSchema } from '../utils/_user-validation-schema';
+import validation from "../middleware/validation.middleware"
 
 const routes: (controller: Controller) => APIRoute[] = (controller: any) => {
 

@@ -1,4 +1,4 @@
-import { Gender } from './../model/profile.model';
+import { Gender } from '../model/profile.model';
 import Joi from "joi";
 
 const updateUserSchema = Joi.object({

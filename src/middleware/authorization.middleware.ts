@@ -3,8 +3,8 @@ import { Strategy, ExtractJwt } from "passport-jwt";
 import { Request, Response, NextFunction } from "express";
 import { setError } from "../utils/error-format"
 import config from '../config'
-import UserServices from "../services/user.services";
-import Container, { Inject } from "typedi";
+import Container from "typedi";
+import { UserRepository } from "../model/user.model";
 
 
 export class AuthorizationMiddleware {
@@ -50,8 +50,16 @@ export class AuthorizationMiddleware {
             }
 
             try {
-                const userService = Container.get(UserServices)
-                const user = await userService.findUser(decryptToken.id);
+                const userReo = Container.get(UserRepository)
+                let user;
+
+                if (req.baseUrl.includes("spaces")) {
+                    user = await userReo.findWithTeam(decryptToken.id);
+                } else {
+                    user = await userReo.findUser(decryptToken.id);
+                }
+
+                console.log(user)
                 req.user = user;
                 next()
             } catch (error) {

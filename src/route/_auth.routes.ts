@@ -5,8 +5,8 @@ import {
     loginSchema,
     sendForgetPasswordLinkSchema,
     forgetPasswordRestSchema
-} from '../utils/aut-validation-schema';
-import validation from "./../middleware/validation.middleware"
+} from '../utils/_aut-validation-schema';
+import validation from "../middleware/validation.middleware"
 
 const routes: (controller: Controller) => APIRoute[] = (controller: any) => {
 

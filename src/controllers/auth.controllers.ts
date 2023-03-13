@@ -1,6 +1,6 @@
 import Controller, { APIRoute } from "../app/controller";
 import { Request, Response, NextFunction } from "express"
-import routes from "../route/auth.routes";
+import routes from "../route/_auth.routes";
 import AuthServices from "../services/auth.services";
 import { Inject } from "typedi";
 import config from "../config";
