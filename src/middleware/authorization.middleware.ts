@@ -53,7 +53,7 @@ export class AuthorizationMiddleware {
                 const userReo = Container.get(UserRepository)
                 let user;
 
-                if (req.baseUrl.includes("spaces")) {
+                if (req.baseUrl.includes("spaces") || req.baseUrl.includes("teams")) {
                     user = await userReo.findWithTeam(decryptToken.id);
                 } else {
                     user = await userReo.findUser(decryptToken.id);

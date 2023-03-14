@@ -6,6 +6,7 @@ import * as bcrypt from "bcrypt";
 import TokenHelper from './jwt.services';
 import RefreshTokenServices from "./refreshTokenList.services";
 import NodeMailerServices from "./nodemailer.services";
+import TeamServices from "./team.service";
 
 @Service()
 export default class AuthServices {
@@ -13,22 +14,26 @@ export default class AuthServices {
     private readonly refreshTokenServices: RefreshTokenServices;
     private readonly tokenHelper: TokenHelper;
     private readonly nodemailerServices: NodeMailerServices;
-
+    private readonly teamServices: TeamServices;
 
     constructor(
         @Inject() userService: UserServices,
         @Inject() refreshTokenServices: RefreshTokenServices,
         @Inject() tokenHelper: TokenHelper,
-        @Inject() nodemailerServices: NodeMailerServices
+        @Inject() nodemailerServices: NodeMailerServices,
+        @Inject() teamServices: TeamServices
     ) {
         this.userService = userService;
         this.refreshTokenServices = refreshTokenServices;
         this.tokenHelper = tokenHelper;
-        this.nodemailerServices = nodemailerServices
+        this.nodemailerServices = nodemailerServices;
+        this.teamServices = teamServices
     }
 
-    async signup(data: IUser) {
+    async signup(data: IUser, token?: string) {
         try {
+
+            console.log(token)
             let isExist = await this.userService.isExist({ username: data.username });
 
             if (isExist) throw setError(409, "username already exists")
@@ -50,6 +55,17 @@ export default class AuthServices {
                 user: user.id,
                 token: refreshToken
             })
+
+            if (token) {
+                const member = await this.teamServices.acceptInvitation(token, user.id);
+
+                return {
+                    user,
+                    member,
+                    accessToken,
+                    refreshToken
+                }
+            }
 
             return {
                 user,

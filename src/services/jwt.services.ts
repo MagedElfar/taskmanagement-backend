@@ -4,7 +4,7 @@ import config from "../config";
 import { setError } from '../utils/error-format';
 
 @Service()
-export default class TokenHelper {
+export default class JwtServices {
     newTokenSign(data: any, expiresIn: string) {
         return sign(data, config.jwt.secret!, {
             expiresIn

@@ -20,6 +20,7 @@ const signupSchema = Joi.object({
 
     email: Joi.string()
         .email()
+        .required()
         .messages({
             "string.email": "invalid email format"
         })

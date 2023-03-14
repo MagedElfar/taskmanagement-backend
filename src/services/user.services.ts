@@ -15,7 +15,7 @@ export default class UserServices {
         this.userRepo = userRepo;
     }
 
-    async findUser(id: number) {
+    async findUser(id: number | Partial<IUser>) {
         try {
             return await this.userRepo.findUser(id);
         } catch (error) {

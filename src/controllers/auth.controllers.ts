@@ -38,8 +38,10 @@ export default class AuthController extends Controller {
     async signupHandler(req: Request, res: Response, next: NextFunction) {
         try {
 
+            const { token } = req.query
 
-            const user = await this.authServices.signup(req.body)
+
+            const user = await this.authServices.signup(req.body, token?.toString())
 
             res.cookie("refresh_token", user.refreshToken, config.cookie.option)
 

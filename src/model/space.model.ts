@@ -51,8 +51,10 @@ export class SpaceRepository extends BaseRepository<ISpace>{
                 .select(
                     "spaces.*",
                     "team.id as teamId",
+                    "team.role as role",
                     "user.username",
                     "user.id as userId",
+                    "user.email as userEmail",
                     "userImg.image_url as userImage"
                 )
                 .leftJoin("teams as team", "team.space", "=", "spaces.id")
