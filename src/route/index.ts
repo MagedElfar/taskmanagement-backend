@@ -2,6 +2,7 @@ import { Container } from 'typedi';
 import Controller from "../app/controller";
 import AuthController from "../controllers/auth.controllers";
 import SpaceController from '../controllers/space.controllers';
+import TaskController from '../controllers/task.controllers';
 import TeamController from '../controllers/team.controller';
 import UserController from '../controllers/user.controllers';
 import AuthServices from "../services/auth.services";
@@ -10,6 +11,7 @@ import ProfileImageServices from '../services/profileImage.services';
 import SpaceServices from '../services/space.services';
 import TeamServices from '../services/team.service';
 import UserServices from '../services/user.services';
+import TaskServices from '../services/task.services';
 
 
 const routes: Controller[] = [
@@ -33,6 +35,11 @@ const routes: Controller[] = [
     new TeamController(
         "/teams",
         Container.get(TeamServices)
+    ),
+
+    new TaskController(
+        "/tasks",
+        Container.get(TaskServices)
     )
 
 ]
