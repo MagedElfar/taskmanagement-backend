@@ -44,6 +44,14 @@ const routes: (controller: Controller) => APIRoute[] = (controller: any) => {
             handler: controller.assignTaskHandler,
             localMiddleware: [validation(assignTaskSchema)],
             auth: true
+        },
+
+        {
+            path: "/assign/:id",
+            method: Methods.DELETE,
+            handler: controller.unassignTaskHandler,
+            localMiddleware: [validation(paramSchema, "param")],
+            auth: true
         }
     ]
     return r;

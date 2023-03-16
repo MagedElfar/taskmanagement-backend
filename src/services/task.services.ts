@@ -129,7 +129,9 @@ export default class TaskServices {
 
             if (!member || !task || member.space !== task?.spaceId) throw setError(400, "can't assign the task for this user");
 
-            await this.takPermission.adminPermission(task.spaceId, userId)
+            const hasPermission = await this.takPermission.adminPermission(task.spaceId, userId)
+
+            if (!hasPermission && task.userId !== userId) throw setError(403, "Forbidden")
 
             return await this.assigneeServices.crate(data)
 
@@ -143,10 +145,12 @@ export default class TaskServices {
 
             const assign = await this.assigneeServices.findOne(assignmentId);
 
+
             if (!assign) throw setError(400, `this user not assign for this task`);
 
+            const hasPermission = await this.takPermission.adminPermission(assign.spaceId, userId)
 
-            await this.takPermission.adminPermission(assign.spaceId, userId)
+            if (!hasPermission) throw setError(403, "Forbidden")
 
             return await this.assigneeServices.delete(assignmentId)
 

@@ -19,6 +19,7 @@ export class AssigneeRepository extends BaseRepository<IAssignee>{
         try {
             const query = this.qb()
                 .leftJoin("teams as member", "member.id", "=", "assignees.memberId")
+                .leftJoin("tasks as task", "task.id", "=", "assignees.taskId")
                 .leftJoin("users as user", "user.id", "=", "member.userId")
                 .leftJoin("profiles_images as userImage", "userImage.userId", "=", "user.id")
                 .select(
@@ -26,7 +27,8 @@ export class AssigneeRepository extends BaseRepository<IAssignee>{
                     "member.space as spaceId",
                     "user.id as userId",
                     "user.username",
-                    "userImage.image_url as url"
+                    "userImage.image_url as url",
+                    "task.userId as author"
                 )
             return typeof id === 'number'
                 ? await query.where('assignees.id', id).first()

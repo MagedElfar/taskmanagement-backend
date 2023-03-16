@@ -129,12 +129,11 @@ export default class TaskController extends Controller {
 
             const { id } = req.params
 
-            const assign = await this.taskServices.delete(userId, +id)
+            await this.taskServices.unAssign(userId, +id)
 
             super.setResponseSuccess({
                 res,
-                status: 201,
-                data: { assign }
+                status: 200,
             })
 
         } catch (error) {
