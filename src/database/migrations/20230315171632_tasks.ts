@@ -10,8 +10,10 @@ export const up = function (knex: Knex) {
             table.enu("priority", ["low", "medium", "heigh"]).defaultTo("low")
             table.date("due_date").nullable();
 
+
             table.integer("spaceId").unsigned().notNullable();
             table.integer("userId").unsigned().notNullable();
+            table.integer("parentId").unsigned().nullable();
             table.integer("projectId").unsigned().nullable();
 
 
@@ -32,6 +34,12 @@ export const up = function (knex: Knex) {
                 inTable("projects")
                 .onUpdate("CASCADE")
                 .onDelete("SET NULL")
+
+            table.foreign("parentId")
+                .references("id").
+                inTable("tasks")
+                .onUpdate("CASCADE")
+                .onDelete("CASCADE")
 
 
             table.timestamps(true, true);

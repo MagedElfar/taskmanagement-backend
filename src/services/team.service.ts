@@ -31,6 +31,13 @@ export default class TeamServices {
     }
 
 
+    async findOne(data: Partial<ITeam> | number) {
+        try {
+            return await this.teamRepo.findOne(data)
+        } catch (error) {
+            throw error
+        }
+    }
 
     async create(userId: number, data: Partial<ITeam>) {
         try {
@@ -130,6 +137,10 @@ export default class TeamServices {
         try {
 
             await this.checkIfOwner(id, userId)
+
+            const member = await this.teamRepo.findOne(id);
+
+            if (!member || member?.userId === userId) throw setError(400, "you cant update role for this user")
 
 
             return await this.teamRepo.update(id, { role })

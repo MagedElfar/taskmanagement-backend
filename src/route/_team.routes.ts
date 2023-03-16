@@ -1,3 +1,4 @@
+import { paramSchema } from './../utils/_commen-validation-schema';
 import Controller, { APIRoute, Methods } from '../app/controller';
 import validation from "../middleware/validation.middleware"
 import spacePermission from "../middleware/space-permissions.middleware"
@@ -26,7 +27,7 @@ const routes: (controller: Controller) => APIRoute[] = (controller: any) => {
             path: "/:id",
             method: Methods.PATCH,
             handler: controller.updateRoleHandler,
-            localMiddleware: [validation(updateRoleSchema)],
+            localMiddleware: [validation(paramSchema, "param"), validation(updateRoleSchema)],
             auth: true
         },
 
@@ -34,7 +35,7 @@ const routes: (controller: Controller) => APIRoute[] = (controller: any) => {
             path: "/:id",
             method: Methods.DELETE,
             handler: controller.removeMemberHandler,
-            localMiddleware: [],
+            localMiddleware: [validation(paramSchema, "param")],
             auth: true
         },
 
@@ -42,7 +43,7 @@ const routes: (controller: Controller) => APIRoute[] = (controller: any) => {
             path: "/leave/:id",
             method: Methods.DELETE,
             handler: controller.leaveTeamHandler,
-            localMiddleware: [],
+            localMiddleware: [validation(paramSchema, "param")],
             auth: true
         },
     ]
