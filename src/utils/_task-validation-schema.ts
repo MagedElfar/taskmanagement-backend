@@ -23,6 +23,9 @@ const assignTaskSchema = Joi.object({
     memberId: Joi.number().required()
 })
 
+const taskAttachmentSchema = Joi.object({
+    taskId: Joi.number().required(),
+})
 
 const getTaskSSchema = Joi.object({
     space: Joi.number().optional(),
@@ -37,5 +40,6 @@ const getTaskSSchema = Joi.object({
 export {
     taskSchema,
     assignTaskSchema,
-    getTaskSSchema
+    getTaskSSchema,
+    taskAttachmentSchema
 }

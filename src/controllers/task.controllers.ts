@@ -3,20 +3,24 @@ import { Request, Response, NextFunction } from "express";
 import routes from "../route/_task.routes";
 import { Inject } from "typedi";
 import TaskServices from "../services/task.services";
+import TaskAttachmentServices from "../services/task_attachments.services";
 
 
 export default class TaskController extends Controller {
     protected routes: APIRoute[];
     private readonly taskServices: TaskServices
+    private readonly taskAttachmentServices: TaskAttachmentServices
 
 
     constructor(
         path: string,
-        @Inject() taskServices: TaskServices
+        @Inject() taskServices: TaskServices,
+        @Inject() taskAttachmentServices: TaskAttachmentServices
     ) {
         super(path);
         this.routes = routes(this);
-        this.taskServices = taskServices
+        this.taskServices = taskServices;
+        this.taskAttachmentServices = taskAttachmentServices
     }
 
     async getTasksHandler(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -165,6 +169,45 @@ export default class TaskController extends Controller {
             super.setResponseSuccess({
                 res,
                 status: 200,
+            })
+
+        } catch (error) {
+            next(error)
+        }
+    };
+
+    async uploadAttachmentHandler(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+
+            const userId = req.user?.id!;
+
+            const attachments = await this.taskAttachmentServices.addAttachment(userId, +req.body.taskId, req.files)
+
+            super.setResponseSuccess({
+                res,
+                status: 201,
+                data: {
+                    attachments
+                }
+            })
+
+        } catch (error) {
+            next(error)
+        }
+    };
+
+    async deleteAttachmentHandler(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+
+            const userId = req.user?.id!;
+
+            const { id } = req.params
+
+            await this.taskAttachmentServices.deleteAtt(userId, +id)
+
+            super.setResponseSuccess({
+                res,
+                status: 200
             })
 
         } catch (error) {

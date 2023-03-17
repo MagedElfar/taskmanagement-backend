@@ -12,6 +12,7 @@ import SpaceServices from '../services/space.services';
 import TeamServices from '../services/team.service';
 import UserServices from '../services/user.services';
 import TaskServices from '../services/task.services';
+import TaskAttachmentServices from '../services/task_attachments.services';
 
 
 const routes: Controller[] = [
@@ -39,7 +40,8 @@ const routes: Controller[] = [
 
     new TaskController(
         "/tasks",
-        Container.get(TaskServices)
+        Container.get(TaskServices),
+        Container.get(TaskAttachmentServices)
     )
 
 ]

@@ -102,6 +102,7 @@ export class TakRepository extends BaseRepository<ITask>{
                 .leftJoin("teams as member", "member.id", "=", "assign.memberId")
                 .leftJoin("users as assignTo", "assignTo.id", "=", "member.userId")
                 .leftJoin("profiles_images as assignToImage", "assignToImage.userId", "=", "assignTo.id")
+                .leftJoin("task_attachments as attachments", "attachments.taskId", "=", "tasks.id")
 
                 .select(
                     "tasks.*",
@@ -111,7 +112,8 @@ export class TakRepository extends BaseRepository<ITask>{
                     "userImage.image_url as url",
                     "assign.id",
                     "assignTo.username",
-                    "assignToImage.image_url as url"
+                    "assignToImage.image_url as url",
+                    "attachments.*"
                 )
                 .options({ nestTables: true })
 
@@ -136,7 +138,8 @@ export class TakRepository extends BaseRepository<ITask>{
                     userImage: "oneToOne",
                     assign: "oneToOne",
                     assignTo: "oneToOne",
-                    assignToImage: "oneToOne"
+                    assignToImage: "oneToOne",
+                    attachments: "oneToMany"
                 });
 
                 if (task) {
@@ -154,6 +157,8 @@ export class TakRepository extends BaseRepository<ITask>{
                     const { userImage, assignTo, assignToImage, ...others } = task
 
                     others.subTasks = others.subTasks.filter((item: any) => item.id)
+
+                    others.attachments = others.attachments.filter((item: any) => item.id)
 
                     return others
 
