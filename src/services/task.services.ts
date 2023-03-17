@@ -39,6 +39,29 @@ export default class TaskServices {
         }
     }
 
+    async find(querySearch: {
+        limit: number,
+        term: string,
+        page: number,
+        userId: number,
+        space?: number,
+        user: any,
+        orderBy: string,
+        order: string
+    }) {
+        try {
+
+            if (querySearch?.space) {
+                const { space, userId } = querySearch
+                const hasPermission = await this.takPermission.userPermission(space, userId);
+                if (!hasPermission) throw setError(403, "Forbidden")
+            }
+
+            return await this.taskRepo.find({}, querySearch)
+        } catch (error) {
+            throw error
+        }
+    }
 
     async create(userId: number, data: Partial<ITask>) {
         try {
@@ -59,7 +82,9 @@ export default class TaskServices {
     async createSubTask(userId: number, data: Partial<ITask>) {
         try {
 
-            await this.checkTask({ id: data.projectId, spaceId: data.spaceId });
+
+
+            await this.checkTask({ id: data.parentId, spaceId: data.spaceId });
 
             return this.create(userId, data)
 
@@ -128,10 +153,6 @@ export default class TaskServices {
             const task = await this.taskRepo.findOne(data.taskId!);
 
             if (!member || !task || member.space !== task?.spaceId) throw setError(400, "can't assign the task for this user");
-
-            const hasPermission = await this.takPermission.adminPermission(task.spaceId, userId)
-
-            if (!hasPermission && task.userId !== userId) throw setError(403, "Forbidden")
 
             return await this.assigneeServices.crate(data)
 

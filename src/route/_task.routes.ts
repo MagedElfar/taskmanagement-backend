@@ -1,11 +1,19 @@
 import Controller, { APIRoute, Methods } from '../app/controller';
 import validation from "../middleware/validation.middleware"
 import { paramSchema } from '../utils/_commen-validation-schema';
-import { assignTaskSchema, taskSchema } from '../utils/_task-validation-schema';
+import { assignTaskSchema, getTaskSSchema, taskSchema } from '../utils/_task-validation-schema';
 
 const routes: (controller: Controller) => APIRoute[] = (controller: any) => {
 
     const r: APIRoute[] = [
+        {
+            path: "/",
+            method: Methods.GET,
+            handler: controller.getTasksHandler,
+            localMiddleware: [validation(getTaskSSchema, "query")],
+            auth: true
+        },
+
         {
             path: "/",
             method: Methods.POST,

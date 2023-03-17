@@ -36,6 +36,62 @@ export class TakRepository extends BaseRepository<ITask>{
         super("tasks")
     }
 
+    async findTask(id: number | Partial<ITask>): Promise<ITask> {
+        try {
+            return await this.qb().where(id).first();
+
+        } catch (error) {
+            console.log(error)
+            throw setError(500, "database failure")
+        }
+    }
+
+    async find(item: Partial<ITask>, option: any): Promise<any> {
+
+        const {
+            user = null,
+            userId,
+            limit = 10,
+            page = 1,
+            term = null,
+            space = null,
+            orderBy = "created_at",
+            order = "asc"
+        } = option
+        try {
+            const query = this.db(this.tableName)
+                .leftJoin("assignees", "assignees.taskId", "=", "tasks.id")
+                .leftJoin("teams as member", "member.id", "=", "assignees.memberId")
+                .select("tasks.*")
+
+            if (user) {
+                query.where("member.userId", "=", userId)
+                    .orWhere("tasks.userId", "=", userId)
+            }
+
+            if (space) {
+                query.orWhere("tasks.spaceId", "=", space)
+            }
+
+            const tasks = await query.clone()
+                .limit(limit)
+                .offset((page - 1) * limit)
+                .orderBy(orderBy, order);
+
+            const count = await query.clone().count('tasks.id as CNT').first();
+
+
+            return {
+                tasks,
+                count: count?.CNT
+            }
+        } catch (error) {
+            console.log(error)
+            throw setError(500, "database failure")
+        }
+    }
+
+
     async findOne(id: number | Partial<ITask>): Promise<ITask> {
         try {
             const query = this.qb()
@@ -60,12 +116,18 @@ export class TakRepository extends BaseRepository<ITask>{
                 .options({ nestTables: true })
 
 
-            typeof id === 'number'
-                ? query.where('tasks.id', id)
-                : Object.keys(id).includes("id") ? query.where({
-                    ...id,
-                    "tasks.id": id.id,
-                }) : query.where(id)
+            if (typeof id === 'number') {
+                query.where('tasks.id', id)
+            } else {
+                Object.keys(id).forEach(key => {
+                    id[`tasks.${key}`] = id[key];
+
+                    delete id[key]
+                })
+                console.log(id)
+                query.where(id)
+            }
+
 
             return await query.then((result) => {
                 const task = oneToManyMapped(result, "tasks", {
@@ -83,13 +145,15 @@ export class TakRepository extends BaseRepository<ITask>{
                         userImage: task.userImage?.url
                     }
 
-                    task.assign = {
+                    task.assign = task.assign.id ? {
                         ...task.assign,
                         username: task.assignTo.username,
                         userImage: task.assignToImage?.url
-                    }
+                    } : null
 
                     const { userImage, assignTo, assignToImage, ...others } = task
+
+                    others.subTasks = others.subTasks.filter((item: any) => item.id)
 
                     return others
 

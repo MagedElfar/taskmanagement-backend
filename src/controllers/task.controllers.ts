@@ -19,6 +19,36 @@ export default class TaskController extends Controller {
         this.taskServices = taskServices
     }
 
+    async getTasksHandler(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+
+
+            const { limit = 10, page = 1, term = "", user, space, orderBy = "created_at", order = "asc" } = req.query;
+
+            const userId = req.user?.id!;
+
+            const tasks = await this.taskServices.find({
+                userId,
+                limit: +limit,
+                page: +page,
+                term: term.toString(),
+                orderBy: orderBy?.toString(),
+                order: order.toString(),
+                space: space ? +space : undefined,
+                user
+            });
+
+            super.setResponseSuccess({
+                res,
+                status: 200,
+                data: { tasks }
+            })
+
+        } catch (error) {
+            next(error)
+        }
+    };
+
     async createHandler(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
 
@@ -26,7 +56,8 @@ export default class TaskController extends Controller {
 
             let task;
 
-            if (!req.body?.parentId) {
+            if (req.body?.parentId) {
+                console.log("dun")
                 task = await this.taskServices.createSubTask(userId, req.body)
             } else {
                 task = await this.taskServices.create(userId, req.body)

@@ -24,8 +24,18 @@ const assignTaskSchema = Joi.object({
 })
 
 
+const getTaskSSchema = Joi.object({
+    space: Joi.number().optional(),
+    term: Joi.string().optional(),
+    pages: Joi.number().optional(),
+    limit: Joi.number().optional(),
+    user: Joi.boolean().optional(),
+    orderBy: Joi.string().optional().valid("created_at", "due_date"),
+    order: Joi.string().optional().valid("desc", "asc"),
+}).or('space', 'user');
 
 export {
     taskSchema,
-    assignTaskSchema
+    assignTaskSchema,
+    getTaskSSchema
 }

@@ -128,7 +128,7 @@ export default abstract class KnexRepository<T> implements BaseRepository<T> {
         }
     }
 
-    async isExist(id: Partial<T>): Promise<boolean> {
+    async isExist(id: number | Partial<T>): Promise<boolean> {
         try {
             const exist = await this.qb().where(id).first();
 
