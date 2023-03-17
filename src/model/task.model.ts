@@ -36,15 +36,7 @@ export class TakRepository extends BaseRepository<ITask>{
         super("tasks")
     }
 
-    async findTask(id: number | Partial<ITask>): Promise<ITask> {
-        try {
-            return await this.qb().where(id).first();
 
-        } catch (error) {
-            console.log(error)
-            throw setError(500, "database failure")
-        }
-    }
 
     async find(item: Partial<ITask>, option: any): Promise<any> {
 
@@ -91,6 +83,34 @@ export class TakRepository extends BaseRepository<ITask>{
         }
     }
 
+    async findTask(id: number | Partial<ITask>): Promise<ITask> {
+        try {
+            const query = this.qb()
+
+                .select(
+                    "tasks.*",
+
+                )
+
+
+            if (typeof id === 'number') {
+                query.where('tasks.id', id)
+            } else {
+                Object.keys(id).forEach(key => {
+                    id[`tasks.${key}`] = id[key];
+
+                    delete id[key]
+                })
+                query.where(id)
+            }
+
+
+            return await query.first()
+        } catch (error) {
+            console.log(error)
+            throw setError(500, "database failure")
+        }
+    }
 
     async findOne(id: number | Partial<ITask>): Promise<ITask> {
         try {

@@ -39,6 +39,20 @@ export default class TaskServices {
         }
     }
 
+    async getTask(userId: number, taskId: number) {
+        try {
+            const task = await this.taskRepo.findTask(taskId);
+
+            const hasPermission = await this.takPermission.userPermission(task.spaceId, userId);
+
+            if (!hasPermission) throw setError(403, "Forbidden")
+
+            return task;
+        } catch (error) {
+            throw error;
+        }
+    }
+
     async find(querySearch: {
         limit: number,
         term: string,

@@ -13,6 +13,8 @@ import TeamServices from '../services/team.service';
 import UserServices from '../services/user.services';
 import TaskServices from '../services/task.services';
 import TaskAttachmentServices from '../services/task_attachments.services';
+import CommentController from '../controllers/comment.controllers';
+import CommentServices from '../services/comment.services';
 
 
 const routes: Controller[] = [
@@ -42,6 +44,11 @@ const routes: Controller[] = [
         "/tasks",
         Container.get(TaskServices),
         Container.get(TaskAttachmentServices)
+    ),
+
+    new CommentController(
+        "/comments",
+        Container.get(CommentServices)
     )
 
 ]

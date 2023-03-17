@@ -31,7 +31,7 @@ export default class TaskAttachmentServices {
 
             const media: any = [];
 
-            await this.taskService.findOne(userId, taskId);
+            await this.taskService.getTask(userId, taskId);
 
             await Promise.all(files.map(async (file: Express.Multer.File) => {
                 const storageData: any = await this.storageService.upload(file.filename, "task")
