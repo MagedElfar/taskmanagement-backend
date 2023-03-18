@@ -1,0 +1,1260 @@
+{
+	"info": {
+		"_postman_id": "b53dc053-5373-4c24-b64c-aa6e9ab21916",
+		"name": "task_management",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "18389212"
+	},
+	"item": [
+		{
+			"name": "auth",
+			"item": [
+				{
+					"name": "login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"wordpress860@gmail.com\",\r\n    \"password\": \"12345678@Ma\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "signup",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"maged\",\r\n    \"email\": \"wordpress860@gmail.com\",\r\n    \"password\": \"12345678@Ma\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/signup?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzcGFjZUlkIjoyMCwiaWF0IjoxNjc4ODAxNTE2LCJleHAiOjE2Nzk0MDYzMTZ9.LTYuqNpJ52xLvWHFzt3kIMuiGOsTML3F191HvAY4csM",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"signup"
+							],
+							"query": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzcGFjZUlkIjoyMCwiaWF0IjoxNjc4ODAxNTE2LCJleHAiOjE2Nzk0MDYzMTZ9.LTYuqNpJ52xLvWHFzt3kIMuiGOsTML3F191HvAY4csM"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "refresh-token",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"maged92\",\r\n    \"email\": \"maged.1992@gmail.com\",\r\n    \"password\": \"12345678@Ma\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/refresh-token",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"refresh-token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "logout",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"maged92\",\r\n    \"email\": \"maged.1992@gmail.com\",\r\n    \"password\": \"12345678@Ma\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/logout",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"logout"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "forget-password-send",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"wordpress860@gmail.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/forget-password/send-mail",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"forget-password",
+								"send-mail"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "forget-password-rest",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n   \"password\": \"12345678@Mag\",\r\n   \"password_confirmation\":\"12345678@Mag\",\r\n   \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwiaWF0IjoxNjc4NDUxNTAwLCJleHAiOjE2Nzg0NTI0MDB9.aNXho66VYsI4-39udpnj3ed28LeqtYncEUvCbHid5NE\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/forget-password/rest",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"forget-password",
+								"rest"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "user",
+			"item": [
+				{
+					"name": "get user",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"title\": \"task 1\",\r\n    \"description\": \"task 1 description\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/users",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update-user",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"maged92\",\r\n    \"email\": \"maged.1992.me@gmail.com\",\r\n    \"gender\": \"male\",\r\n    \"first_name\": \"maged\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/users",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create-profile",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"first_name\": \"maged\",\r\n    \"last_name\": \"elfar\",\r\n    \"gender\": \"male\",\r\n    \"phone\": \"00201115138688\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/users/profile",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"users",
+								"profile"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "photo-upload",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "image",
+									"type": "file",
+									"src": "/C:/Users/HP/Downloads/ai-image-enlarger-1-after-2.jpg"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{url}}/users/image",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"users",
+								"image"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "photo-delete",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/C:/Users/HP/Downloads/beautiful-rain-forest-ang-ka-nature-trail-doi-inthanon-national-park-thailand-36703721.jpg"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{url}}/users/image/1",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"users",
+								"image",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "spaces",
+			"item": [
+				{
+					"name": "get spaces",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/spaces?limit=10&page=1",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"spaces"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "term",
+									"value": "co",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get space",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"maged seconde workspace\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/spaces/22",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"spaces",
+								"22"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create space",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"test tasks space\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/spaces",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"spaces"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update space",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"maged seconde workspace\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/spaces/8",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"spaces",
+								"8"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete space",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"maged seconde workspace\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/spaces/2",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"spaces",
+								"2"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "teams",
+			"item": [
+				{
+					"name": "send invite member mail",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"space\": 21,\r\n    \"email\": \"wordpress860@gmail.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/teams/invite",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"teams",
+								"invite"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add member",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/teams/add?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjcsInNwYWNlSWQiOjIxLCJpYXQiOjE2Nzg5Njk2MDIsImV4cCI6MTY3OTU3NDQwMn0.OrTyag99OgLuqDs27p9VyB9yfAlLFHa_uVIIVpfDT9Q",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"teams",
+								"add"
+							],
+							"query": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjcsInNwYWNlSWQiOjIxLCJpYXQiOjE2Nzg5Njk2MDIsImV4cCI6MTY3OTU3NDQwMn0.OrTyag99OgLuqDs27p9VyB9yfAlLFHa_uVIIVpfDT9Q"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update member",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"role\" : \"member\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/teams/21",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"teams",
+								"21"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "remove member",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"project\": 6,\r\n    \"user\": 5\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/teams/20",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"teams",
+								"20"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "leave team",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"project\": 6,\r\n    \"user\": 5\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/teams/leave/19",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"teams",
+								"leave",
+								"19"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "projects",
+			"item": [
+				{
+					"name": "get projects",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/projects?limit=10&page=1&spaceId=21",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"projects"
+							],
+							"query": [
+								{
+									"key": "term",
+									"value": "t",
+									"disabled": true
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "spaceId",
+									"value": "21"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"project 2nd space\",\r\n    \"spaceId\": 22\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/projects",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"projects"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"loval pro\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/projects/2",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"projects",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/projects/\"gg",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"projects",
+								"\"gg"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "tasks",
+			"item": [
+				{
+					"name": "get-tasks",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"title\": \"task 1\",\r\n    \"description\": \"task 1 description\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/tasks?user=true&orderBy=due_dat&project=2&term=t",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"tasks"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "open",
+									"disabled": true
+								},
+								{
+									"key": "search",
+									"value": "t",
+									"disabled": true
+								},
+								{
+									"key": "limit",
+									"value": "10",
+									"disabled": true
+								},
+								{
+									"key": "page",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "user",
+									"value": "2",
+									"disabled": true
+								},
+								{
+									"key": "user",
+									"value": "true"
+								},
+								{
+									"key": "space",
+									"value": " 21",
+									"disabled": true
+								},
+								{
+									"key": "order",
+									"value": "asc",
+									"disabled": true
+								},
+								{
+									"key": "orderBy",
+									"value": "due_dat"
+								},
+								{
+									"key": "status",
+									"value": "in progress",
+									"disabled": true
+								},
+								{
+									"key": "project",
+									"value": "2"
+								},
+								{
+									"key": "term",
+									"value": "t"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get-task",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/tasks/12",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"tasks",
+								"12"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create-task",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"title\": \"tak space\",\r\n    \"description\":\"test\",\r\n    \"due_date\": \"2023-03-18\",\r\n    \"spaceId\": \"21\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/tasks",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"tasks"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update-task",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n   \"title\": \"task\",\r\n    \"description\":\"just test\",\r\n    \"due_date\": \"2023-03-19\",\r\n    \"spaceId\": \"21\",\r\n    \"projectId\": null\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/tasks/12",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"tasks",
+								"12"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update-task-status",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"status\": \"in progress\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/tasks/1",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"tasks",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete-task",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"title\": \"task 1\",\r\n    \"description\": \"task 1 description\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/tasks/9",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"tasks",
+								"9"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "assign task",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"taskId\": 12,\r\n    \"memberId\": 21\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/tasks/assign",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"tasks",
+								"assign"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "unassign",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"taskId\": 13,\r\n    \"assignmentsToId\": 5\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/tasks/assign/5",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"tasks",
+								"assign",
+								"5"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "upload task attachment",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "taskId",
+									"value": "4",
+									"type": "text"
+								},
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/C:/Users/HP/Downloads/beautiful-rain-forest-ang-ka-nature-trail-doi-inthanon-national-park-thailand-36703721.jpg"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{url}}/tasks/attachment",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"tasks",
+								"attachment"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete task attachment",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "taskId",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/C:/Users/HP/Downloads/beautiful-rain-forest-ang-ka-nature-trail-doi-inthanon-national-park-thailand-36703721.jpg"
+								},
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/C:/Users/HP/Downloads/phones-over-landlines.jpg"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{url}}/tasks/attachment/3",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"tasks",
+								"attachment",
+								"3"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "comments",
+			"item": [
+				{
+					"name": "add comment",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"taskId\": \"1\",\r\n    \"comment\": \"maged92 comment\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/comments",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"comments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get comment",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"taskId\": \"1\",\r\n    \"comment\": \"firsr comment\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/comments?taskId=10",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"comments"
+							],
+							"query": [
+								{
+									"key": "taskId",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete comment",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"taskId\": \"1\",\r\n    \"comment\": \"firsr comment\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/comments/1",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"comments",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "activities",
+			"item": [
+				{
+					"name": "get activities",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/activities?taskId=12&limit=3&page=2",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"activities"
+							],
+							"query": [
+								{
+									"key": "taskId",
+									"value": "12"
+								},
+								{
+									"key": "limit",
+									"value": "3"
+								},
+								{
+									"key": "page",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{token-user1}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "url",
+			"value": "http://localhost:5000/api",
+			"type": "string"
+		},
+		{
+			"key": "token-user1",
+			"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwiaWF0IjoxNjc4NDU5MjEyLCJleHAiOjE2Nzg1NDU2MTJ9.ohBveanc8AfQTcZWbxQ8wV7ExMd0zF-_N5f9X3aclDE",
+			"type": "string"
+		},
+		{
+			"key": "token-user2",
+			"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwiaWF0IjoxNjc2ODA4MTE2LCJleHAiOjE3MDgzNjU3MTZ9.uPd1dpqh3siGH8EJBB7aLZlqREwYoPiJFzINWh0zkRA.eyJpZCI6NCwiaWF0IjoxNjc2NzI0OTQwLCJleHAiOjE3MDgyODI1NDB9.xnE_UIu-a39x6R5brwKopmG7BV1BPBn6LA67qmXiV00",
+			"type": "string"
+		}
+	]
+}

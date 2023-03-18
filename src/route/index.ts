@@ -15,6 +15,10 @@ import TaskServices from '../services/task.services';
 import TaskAttachmentServices from '../services/task_attachments.services';
 import CommentController from '../controllers/comment.controllers';
 import CommentServices from '../services/comment.services';
+import ActivityServices from '../services/activity.services';
+import ActivityController from '../controllers/activity.controllers';
+import ProjectServices from '../services/project.services';
+import ProjectController from '../controllers/project.controllers';
 
 
 const routes: Controller[] = [
@@ -32,7 +36,8 @@ const routes: Controller[] = [
 
     new SpaceController(
         "/spaces",
-        Container.get(SpaceServices)
+        Container.get(SpaceServices),
+        Container.get(ProjectServices)
     ),
 
     new TeamController(
@@ -43,12 +48,24 @@ const routes: Controller[] = [
     new TaskController(
         "/tasks",
         Container.get(TaskServices),
-        Container.get(TaskAttachmentServices)
+        Container.get(TaskAttachmentServices),
+        Container.get(CommentServices),
+        Container.get(ActivityServices)
     ),
 
     new CommentController(
         "/comments",
         Container.get(CommentServices)
+    ),
+
+    new ActivityController(
+        "/activities",
+        Container.get(ActivityServices)
+    ),
+
+    new ProjectController(
+        "/projects",
+        Container.get(ProjectServices)
     )
 
 ]

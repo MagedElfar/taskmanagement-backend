@@ -2,7 +2,7 @@ import Controller, { APIRoute, Methods } from '../app/controller';
 import Multer from '../middleware/multer.middleware';
 import validation from "../middleware/validation.middleware"
 import { paramSchema } from '../utils/_commen-validation-schema';
-import { assignTaskSchema, getTaskSSchema, taskAttachmentSchema, taskSchema } from '../utils/_task-validation-schema';
+import { assignTaskSchema, getTaskSSchema, taskAttachmentSchema, taskSchema, updateTaskStatus } from '../utils/_task-validation-schema';
 
 const routes: (controller: Controller) => APIRoute[] = (controller: any) => {
 
@@ -36,6 +36,14 @@ const routes: (controller: Controller) => APIRoute[] = (controller: any) => {
             method: Methods.PUT,
             handler: controller.updateTaskHandler,
             localMiddleware: [validation(paramSchema, "param"), validation(taskSchema)],
+            auth: true
+        },
+
+        {
+            path: "/:id",
+            method: Methods.PATCH,
+            handler: controller.updateTaskStatusHandler,
+            localMiddleware: [validation(paramSchema, "param"), validation(updateTaskStatus)],
             auth: true
         },
 

@@ -27,7 +27,7 @@ export default class CommentController extends Controller {
 
             const userId = req.user?.id!;
 
-            const comments = await this.commentServices.find(userId, +taskId, {
+            const data = await this.commentServices.find(userId, +taskId, {
                 limit: +limit,
                 page: +page,
             });
@@ -35,7 +35,7 @@ export default class CommentController extends Controller {
             super.setResponseSuccess({
                 res,
                 status: 200,
-                data: { comments }
+                data: { data }
             })
 
         } catch (error) {

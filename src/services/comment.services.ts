@@ -20,6 +20,14 @@ export default class CommentServices {
         this.takPermission = takPermission;
     }
 
+    async _find(taskId: number, querySearch: { limit: number, page: number }) {
+        try {
+            return await this.commentRepository.find({ taskId }, querySearch)
+        } catch (error) {
+            throw error
+        }
+    }
+
     async find(userId: number, taskId: number, querySearch: { limit: number, page: number }) {
         try {
             await this.taskService.getTask(userId, taskId!);

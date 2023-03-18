@@ -9,7 +9,9 @@ const commentSchema = Joi.object({
 
 const getCommentsSchema = Joi.object({
     taskId: Joi.number()
-        .required()
+        .required(),
+    limit: Joi.number().optional(),
+    page: Joi.number().optional()
 })
 
 

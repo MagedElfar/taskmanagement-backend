@@ -48,7 +48,9 @@ export class TakRepository extends BaseRepository<ITask>{
             term = null,
             space = null,
             orderBy = "created_at",
-            order = "asc"
+            order = "asc",
+            status,
+            project
         } = option
         try {
             const query = this.db(this.tableName)
@@ -62,7 +64,19 @@ export class TakRepository extends BaseRepository<ITask>{
             }
 
             if (space) {
-                query.orWhere("tasks.spaceId", "=", space)
+                query.andWhere("tasks.spaceId", "=", space)
+            }
+
+            if (status) {
+                query.andWhere("tasks.status", "=", status)
+            }
+
+            if (term) {
+                query.andWhere("tasks.title", "like", `%${term}%`)
+            }
+
+            if (project) {
+                query.andWhere("tasks.projectId", "=", project)
             }
 
             const tasks = await query.clone()
@@ -123,6 +137,7 @@ export class TakRepository extends BaseRepository<ITask>{
                 .leftJoin("users as assignTo", "assignTo.id", "=", "member.userId")
                 .leftJoin("profiles_images as assignToImage", "assignToImage.userId", "=", "assignTo.id")
                 .leftJoin("task_attachments as attachments", "attachments.taskId", "=", "tasks.id")
+                .leftJoin("projects as project", "project.id", "=", "tasks.projectId")
 
                 .select(
                     "tasks.*",
@@ -133,7 +148,9 @@ export class TakRepository extends BaseRepository<ITask>{
                     "assign.id",
                     "assignTo.username",
                     "assignToImage.image_url as url",
-                    "attachments.*"
+                    "attachments.*",
+                    "project.id",
+                    "project.name"
                 )
                 .options({ nestTables: true })
 
@@ -159,6 +176,7 @@ export class TakRepository extends BaseRepository<ITask>{
                     assign: "oneToOne",
                     assignTo: "oneToOne",
                     assignToImage: "oneToOne",
+                    project: "oneToOne",
                     attachments: "oneToMany"
                 });
 
@@ -173,6 +191,8 @@ export class TakRepository extends BaseRepository<ITask>{
                         username: task.assignTo.username,
                         userImage: task.assignToImage?.url
                     } : null
+
+                    task.project = task.assign?.id ? task.project : null;
 
                     const { userImage, assignTo, assignToImage, ...others } = task
 

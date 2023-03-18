@@ -3,7 +3,7 @@ import { Role } from "../model/team.model";
 import TeamServices from "../services/team.service";
 
 @Service()
-export default class TakPermission {
+export default class TaskPermission {
 
     private readonly teamService: TeamServices;
 

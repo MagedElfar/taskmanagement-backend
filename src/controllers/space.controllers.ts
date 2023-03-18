@@ -3,20 +3,24 @@ import { Request, Response, NextFunction } from "express";
 import routes from "../route/_space.routes";
 import { Inject } from "typedi";
 import SpaceServices from "../services/space.services";
+import ProjectServices from "../services/project.services";
 
 
 export default class SpaceController extends Controller {
     protected routes: APIRoute[];
     private readonly spaceServices: SpaceServices
+    private readonly projectServices: ProjectServices
 
 
     constructor(
         path: string,
-        @Inject() spaceServices: SpaceServices
+        @Inject() spaceServices: SpaceServices,
+        @Inject() projectServices: ProjectServices
     ) {
         super(path);
         this.routes = routes(this);
-        this.spaceServices = spaceServices
+        this.spaceServices = spaceServices;
+        this.projectServices = projectServices
     }
 
     async getSpacesHandler(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -25,18 +29,17 @@ export default class SpaceController extends Controller {
             const userId = req.user?.id!;
             const { limit = 10, page = 1, term = "" } = req.query
 
-            const space = await this.spaceServices.find({
+            const data = await this.spaceServices.find({
                 userId,
                 limit: +limit,
                 page: +page,
                 term: term.toString()
             });
 
-            console.log(space)
             super.setResponseSuccess({
                 res,
                 status: 200,
-                data: { space }
+                data: { data }
             })
 
         } catch (error) {
@@ -52,10 +55,15 @@ export default class SpaceController extends Controller {
 
             const space = await this.spaceServices.findOne(+id);
 
+            const { projects } = await this.projectServices._find(+id)
+
             super.setResponseSuccess({
                 res,
                 status: 200,
-                data: { space }
+                data: {
+                    space,
+                    projects
+                }
             })
 
         } catch (error) {

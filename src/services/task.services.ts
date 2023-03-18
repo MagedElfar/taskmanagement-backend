@@ -1,30 +1,40 @@
 import { AssigneeRepository, IAssignee } from './../model/assignee.model';
-import { TakRepository, ITask } from './../model/task.model';
+import { TakRepository, ITask, TaskStatus } from './../model/task.model';
 import { Inject, Service } from "typedi";
 import { setError } from '../utils/error-format';
 import TeamServices from './team.service';
 import { Role } from "../model/team.model";
 import TakPermission from '../middleware/task-permissions.middleware';
 import AssigneeServices from './assignee.services';
+import ActivityServices from './activity.services';
+import ProjectServices from './project.services';
 
 @Service()
 export default class TaskServices {
     private readonly taskRepo: TakRepository;
     private readonly takPermission: TakPermission;
     private readonly assigneeServices: AssigneeServices;
-    private readonly teamService: TeamServices
+    private readonly teamService: TeamServices;
+    private readonly activityServices: ActivityServices;
+    private readonly projectServices: ProjectServices
+
 
 
     constructor(
         @Inject() taskRepo: TakRepository,
         @Inject() takPermission: TakPermission,
         @Inject() assigneeServices: AssigneeServices,
-        @Inject() teamService: TeamServices
+        @Inject() teamService: TeamServices,
+        @Inject(type => ActivityServices) activityServices: ActivityServices,
+        @Inject() projectServices: ProjectServices
+
     ) {
         this.taskRepo = taskRepo;
         this.takPermission = takPermission;
         this.assigneeServices = assigneeServices;
-        this.teamService = teamService
+        this.teamService = teamService;
+        this.activityServices = activityServices,
+            this.projectServices = projectServices
     }
 
     private async checkTask(taskId: number | Partial<ITask>) {
@@ -43,6 +53,8 @@ export default class TaskServices {
         try {
             const task = await this.taskRepo.findTask(taskId);
 
+            if (!task) throw setError(404, "not found")
+
             const hasPermission = await this.takPermission.userPermission(task.spaceId, userId);
 
             if (!hasPermission) throw setError(403, "Forbidden")
@@ -59,9 +71,11 @@ export default class TaskServices {
         page: number,
         userId: number,
         space?: number,
+        project?: number,
         user: any,
         orderBy: string,
-        order: string
+        order: string,
+        status: string
     }) {
         try {
 
@@ -84,10 +98,28 @@ export default class TaskServices {
 
             if (!hasPermission) throw setError(403, "Forbidden")
 
-            return this.taskRepo.create({
+
+            if (data.projectId) {
+                const project = await this.projectServices.findOne({
+                    id: data.projectId,
+                    spaceId: data.spaceId
+                });
+
+                if (!project) throw setError(404, "project not found")
+            }
+
+            const task = await this.taskRepo.create({
                 ...data,
                 userId
             })
+
+            await this.activityServices.addActivity({
+                taskId: task.id,
+                activity: "created the task",
+                user1_Id: userId
+            })
+
+            return task;
         } catch (error) {
             throw error;
         }
@@ -95,8 +127,6 @@ export default class TaskServices {
 
     async createSubTask(userId: number, data: Partial<ITask>) {
         try {
-
-
 
             await this.checkTask({ id: data.parentId, spaceId: data.spaceId });
 
@@ -123,13 +153,54 @@ export default class TaskServices {
 
     async update(userId: number, taskId: number, data: Partial<ITask>) {
         try {
-            const task = await this.checkTask(taskId)
+            let task = await this.checkTask(taskId)
 
             const hasPermission = await this.takPermission.adminPermission(task.spaceId, userId);
 
-            if (!hasPermission && task.userId !== userId) throw setError(403, "Forbidden")
+            if (!hasPermission && task.userId !== userId) throw setError(403, "Forbidden");
 
-            return await this.taskRepo.update(taskId, data);
+            if (data.projectId) {
+                const project = await this.projectServices.findOne({
+                    id: data.projectId,
+                    spaceId: data.spaceId
+                });
+
+                console.log(project)
+
+
+                if (!project) throw setError(404, "project not found")
+            }
+
+
+            task = await this.taskRepo.update(taskId, data);
+
+            await this.activityServices.addActivity({
+                taskId: task.id,
+                activity: "update the task",
+                user1_Id: userId
+            })
+
+        } catch (error) {
+            throw error;
+        }
+    }
+
+
+    async updateStatus(userId: number, taskId: number, status: TaskStatus) {
+        try {
+            let task = await this.checkTask(taskId)
+
+            await this.getTask(userId, taskId);
+
+            task = await this.taskRepo.update(taskId, {
+                status
+            });
+
+            await this.activityServices.addActivity({
+                taskId: task.id,
+                activity: `update task status to ${status}`,
+                user1_Id: userId
+            })
 
         } catch (error) {
             throw error;
@@ -156,7 +227,7 @@ export default class TaskServices {
     async assign(userId: number, data: Partial<IAssignee>) {
         try {
 
-            const assign = await this.assigneeServices.findOne({
+            let assign = await this.assigneeServices.findOne({
                 taskId: data.taskId,
             });
 
@@ -168,7 +239,16 @@ export default class TaskServices {
 
             if (!member || !task || member.space !== task?.spaceId) throw setError(400, "can't assign the task for this user");
 
-            return await this.assigneeServices.crate(data)
+            assign = await this.assigneeServices.crate(data);
+
+            await this.activityServices.addActivity({
+                taskId: data.taskId,
+                activity: "assign the task to",
+                user1_Id: userId,
+                user2_Id: member.userId
+            })
+
+            return assign;
 
         } catch (error) {
             throw error;
@@ -187,7 +267,16 @@ export default class TaskServices {
 
             if (!hasPermission) throw setError(403, "Forbidden")
 
-            return await this.assigneeServices.delete(assignmentId)
+            await this.assigneeServices.delete(assignmentId)
+
+            await this.activityServices.addActivity({
+                taskId: assign.taskId,
+                activity: "unassign",
+                user1_Id: userId,
+                user2_Id: assign.userId
+            })
+
+            return;
 
         } catch (error) {
             throw error;
