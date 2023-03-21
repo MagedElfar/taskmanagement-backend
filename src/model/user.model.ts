@@ -16,43 +16,6 @@ export class UserRepository extends BaseRepository<IUser>{
         super("users")
     }
 
-    async findUser(id: number | Partial<IUser>) {
-        try {
-
-            return typeof id === 'number'
-                ? await this.qb().where('users.id', id).first()
-                : await this.qb().where(id).first()
-
-        } catch (error) {
-            console.log(error)
-            throw setError(500, "database failure")
-        }
-    }
-
-    async findWithTeam(id: number | Partial<IUser>) {
-        try {
-            const q = this.qb()
-                .select("users.*", "teams.*")
-                .leftJoin("teams", "teams.userId", "=", "users.id")
-                .options({ nestTables: true })
-
-            const user = typeof id === 'number'
-                ? q.where('users.id', id)
-                : q.where(id)
-
-
-            return await q.then((result) => {
-                return oneToManyMapped(result, "users", {
-                    teams: "oneToMany"
-                })
-            })
-        } catch (error) {
-            console.log(error)
-            throw setError(500, "database failure")
-        }
-    }
-
-
     async findOne(id: number | Partial<IUser>): Promise<IUser> {
         try {
             const query = this.db(this.tableName)

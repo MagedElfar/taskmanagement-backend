@@ -2,7 +2,16 @@ import Controller, { APIRoute, Methods } from '../app/controller';
 import Multer from '../middleware/multer.middleware';
 import validation from "../middleware/validation.middleware"
 import { paramSchema } from '../utils/_commen-validation-schema';
-import { assignTaskSchema, getTaskSSchema, taskAttachmentSchema, taskSchema, updateTaskStatus } from '../utils/_task-validation-schema';
+import PermissionsFactory from '../middleware/permissions.middleware';
+import {
+    assignTaskSchema,
+    getTaskSSchema,
+    taskAttachmentSchema,
+    taskSchema,
+    updateTaskStatus
+} from '../utils/_task-validation-schema';
+
+const Permission = PermissionsFactory.getPermissions("tasks")
 
 const routes: (controller: Controller) => APIRoute[] = (controller: any) => {
 
@@ -11,7 +20,10 @@ const routes: (controller: Controller) => APIRoute[] = (controller: any) => {
             path: "/",
             method: Methods.GET,
             handler: controller.getTasksHandler,
-            localMiddleware: [validation(getTaskSSchema, "query")],
+            localMiddleware: [
+                validation(getTaskSSchema, "query"),
+                Permission.memberPermissions
+            ],
             auth: true
         },
 
@@ -19,7 +31,10 @@ const routes: (controller: Controller) => APIRoute[] = (controller: any) => {
             path: "/",
             method: Methods.POST,
             handler: controller.createHandler,
-            localMiddleware: [validation(taskSchema)],
+            localMiddleware: [
+                validation(taskSchema),
+                Permission.memberPermissions
+            ],
             auth: true
         },
 
@@ -27,7 +42,10 @@ const routes: (controller: Controller) => APIRoute[] = (controller: any) => {
             path: "/:id",
             method: Methods.GET,
             handler: controller.getTaskHandler,
-            localMiddleware: [validation(paramSchema, "param")],
+            localMiddleware: [
+                validation(paramSchema, "param"),
+                Permission.memberPermissions
+            ],
             auth: true
         },
 
@@ -35,7 +53,11 @@ const routes: (controller: Controller) => APIRoute[] = (controller: any) => {
             path: "/:id",
             method: Methods.PUT,
             handler: controller.updateTaskHandler,
-            localMiddleware: [validation(paramSchema, "param"), validation(taskSchema)],
+            localMiddleware: [
+                validation(paramSchema, "param"),
+                validation(taskSchema),
+                Permission.memberPermissions
+            ],
             auth: true
         },
 
@@ -43,7 +65,11 @@ const routes: (controller: Controller) => APIRoute[] = (controller: any) => {
             path: "/:id",
             method: Methods.PATCH,
             handler: controller.updateTaskStatusHandler,
-            localMiddleware: [validation(paramSchema, "param"), validation(updateTaskStatus)],
+            localMiddleware: [
+                validation(paramSchema, "param"),
+                validation(updateTaskStatus),
+                Permission.memberPermissions
+            ],
             auth: true
         },
 
@@ -51,7 +77,10 @@ const routes: (controller: Controller) => APIRoute[] = (controller: any) => {
             path: "/:id",
             method: Methods.DELETE,
             handler: controller.deleteTaskHandler,
-            localMiddleware: [validation(paramSchema, "param")],
+            localMiddleware: [
+                validation(paramSchema, "param"),
+                Permission.memberPermissions
+            ],
             auth: true
         },
 
@@ -59,7 +88,10 @@ const routes: (controller: Controller) => APIRoute[] = (controller: any) => {
             path: "/assign",
             method: Methods.POST,
             handler: controller.assignTaskHandler,
-            localMiddleware: [validation(assignTaskSchema)],
+            localMiddleware: [
+                validation(assignTaskSchema),
+                Permission.memberPermissions
+            ],
             auth: true
         },
 

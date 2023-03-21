@@ -30,6 +30,10 @@ export default class TeamServices {
 
     }
 
+    teamQueryServices() {
+        return this.teamRepo.qb()
+    }
+
 
     async findOne(data: Partial<ITeam> | number) {
         try {
@@ -55,8 +59,6 @@ export default class TeamServices {
     async sendInvitation(senderName: string, email: string, spaceId: number) {
         try {
             const space = await this.spaceService.findOne(spaceId);
-
-            console.log(space)
 
             if (!space) throw setError(404, "workspace not exists")
 
@@ -119,42 +121,16 @@ export default class TeamServices {
         }
     }
 
-    private async checkIfOwner(id: number, userId: number) {
+    async update(id: number, role: Role) {
         try {
-            const member = await this.teamRepo.findOne(id);
-
-            if (!member || member?.spaceOwner !== userId) throw setError(403, "Forbidden");
-
-
-            return true;
-
-        } catch (error) {
-            throw error;
-        }
-    }
-
-    async update(userId: number, id: number, role: Role) {
-        try {
-
-            await this.checkIfOwner(id, userId)
-
-            const member = await this.teamRepo.findOne(id);
-
-            if (!member || member?.userId === userId) throw setError(400, "you cant update role for this user")
-
-
             return await this.teamRepo.update(id, { role })
         } catch (error) {
             throw error
         }
     }
 
-    async remove(userId: number, id: number) {
+    async remove(id: number) {
         try {
-
-            await this.checkIfOwner(id, userId)
-
-
             return await this.teamRepo.delete(id)
         } catch (error) {
             throw error
@@ -163,10 +139,9 @@ export default class TeamServices {
 
     async leave(userId: number, id: number) {
         try {
+            const member: ITeam = await this.teamRepo.findOne(id);
 
-            const member = await this.teamRepo.findOne(id);
-
-            if (!member || member?.spaceOwner === userId || member?.userId !== userId) throw setError(403, "Forbidden");
+            if (!member || member.userId !== userId || member.role === Role.OWNER) throw setError(403, "Forbidden");
 
             return await this.teamRepo.delete(id)
         } catch (error) {

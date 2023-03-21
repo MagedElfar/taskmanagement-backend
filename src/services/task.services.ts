@@ -37,6 +37,10 @@ export default class TaskServices {
             this.projectServices = projectServices
     }
 
+    QueryServices() {
+        return this.taskRepo.qb()
+    }
+
     private async checkTask(taskId: number | Partial<ITask>) {
         try {
             const task = await this.taskRepo.findOne(taskId)
@@ -79,11 +83,7 @@ export default class TaskServices {
     }) {
         try {
 
-            if (querySearch?.space) {
-                const { space, userId } = querySearch
-                const hasPermission = await this.takPermission.userPermission(space, userId);
-                if (!hasPermission) throw setError(403, "Forbidden")
-            }
+
 
             return await this.taskRepo.find({}, querySearch)
         } catch (error) {
@@ -93,11 +93,6 @@ export default class TaskServices {
 
     async create(userId: number, data: Partial<ITask>) {
         try {
-
-            const hasPermission = await this.takPermission.userPermission(data.spaceId!, userId);
-
-            if (!hasPermission) throw setError(403, "Forbidden")
-
 
             if (data.projectId) {
                 const project = await this.projectServices.findOne({
@@ -139,12 +134,7 @@ export default class TaskServices {
 
     async findOne(userId: number, taskId: number) {
         try {
-            const task = await this.checkTask(taskId);
-
-            const hasPermission = await this.takPermission.userPermission(task.spaceId, userId);
-
-            if (!hasPermission) throw setError(403, "Forbidden")
-
+            const task = await this.taskRepo.findOne(taskId);
             return task;
         } catch (error) {
             throw error;
@@ -153,11 +143,7 @@ export default class TaskServices {
 
     async update(userId: number, taskId: number, data: Partial<ITask>) {
         try {
-            let task = await this.checkTask(taskId)
 
-            const hasPermission = await this.takPermission.adminPermission(task.spaceId, userId);
-
-            if (!hasPermission && task.userId !== userId) throw setError(403, "Forbidden");
 
             if (data.projectId) {
                 const project = await this.projectServices.findOne({
@@ -172,7 +158,7 @@ export default class TaskServices {
             }
 
 
-            task = await this.taskRepo.update(taskId, data);
+            const task = await this.taskRepo.update(taskId, data);
 
             await this.activityServices.addActivity({
                 taskId: task.id,
@@ -188,11 +174,8 @@ export default class TaskServices {
 
     async updateStatus(userId: number, taskId: number, status: TaskStatus) {
         try {
-            let task = await this.checkTask(taskId)
 
-            await this.getTask(userId, taskId);
-
-            task = await this.taskRepo.update(taskId, {
+            const task = await this.taskRepo.update(taskId, {
                 status
             });
 
@@ -235,9 +218,9 @@ export default class TaskServices {
 
             const member = await this.teamService.findOne(data.memberId!);
 
-            const task = await this.taskRepo.findOne(data.taskId!);
+            const task = await this.taskRepo.qb().where("id", "=", data.taskId!).first();
 
-            if (!member || !task || member.space !== task?.spaceId) throw setError(400, "can't assign the task for this user");
+            if (!member || member.space !== task?.spaceId) throw setError(400, "can't assign the task for this user");
 
             assign = await this.assigneeServices.crate(data);
 

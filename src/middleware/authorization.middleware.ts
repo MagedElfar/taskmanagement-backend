@@ -5,6 +5,7 @@ import { setError } from "../utils/error-format"
 import config from '../config'
 import Container from "typedi";
 import { UserRepository } from "../model/user.model";
+import UserServices from "../services/user.services";
 
 
 export class AuthorizationMiddleware {
@@ -50,14 +51,9 @@ export class AuthorizationMiddleware {
             }
 
             try {
-                const userReo = Container.get(UserRepository)
-                let user;
+                const userSrv = Container.get(UserServices)
 
-                if (req.baseUrl.includes("spaces") || req.baseUrl.includes("teams")) {
-                    user = await userReo.findWithTeam(decryptToken.id);
-                } else {
-                    user = await userReo.findUser(decryptToken.id);
-                }
+                const user = await userSrv.findUser({ id: decryptToken.id });
 
                 console.log(user)
                 req.user = user;

@@ -34,11 +34,13 @@ const taskAttachmentSchema = Joi.object({
 
 const getTaskSSchema = Joi.object({
     space: Joi.number().optional(),
-    project: Joi.number().optional(),
+    project: Joi.number(),
     term: Joi.string().optional(),
     pages: Joi.number().optional(),
     limit: Joi.number().optional(),
-    user: Joi.boolean().optional(),
+    user: Joi.boolean().optional().valid(true),
+    // .when(['project', { is: Joi.exist(), then: Joi.required(), otherwise: Joi.optional() }])
+    // .when('space', { is: Joi.exist(), then: Joi.required(), otherwise: Joi.optional() }),
     orderBy: Joi.string().optional().valid("created_at", "due_date"),
     order: Joi.string().optional().valid("desc", "asc"),
     status: Joi.string().optional().valid(...Object.values(TaskStatus)),

@@ -31,7 +31,7 @@ export default class SpaceServices {
         try {
             const isExist = await this.spaceRepo.isExist({ id })
 
-            if (!isExist) throw setError(403, "Forbidden")
+            if (!isExist) throw setError(404, "space not found");
 
             return await this.spaceRepo.findOne(id)
 
@@ -64,7 +64,7 @@ export default class SpaceServices {
         try {
             const isExist = await this.spaceRepo.isExist({ id })
 
-            if (!isExist) throw setError(403, "Forbidden")
+            if (!isExist) throw setError(404, "space not found")
 
             return await this.spaceRepo.update(id, data)
         } catch (error) {
@@ -76,7 +76,7 @@ export default class SpaceServices {
         try {
             const isExist = await this.spaceRepo.isExist({ id })
 
-            if (!isExist) throw setError(403, "Forbidden")
+            if (!isExist) throw setError(404, "space not found")
 
             return await this.spaceRepo.delete(id)
         } catch (error) {

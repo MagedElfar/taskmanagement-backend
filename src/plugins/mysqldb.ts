@@ -128,6 +128,17 @@ export default abstract class KnexRepository<T> implements BaseRepository<T> {
         }
     }
 
+    findItem(id: number | Partial<T>) {
+        try {
+            return typeof id === 'number'
+                ? this.qb().where('id', id).first()
+                : this.qb().where(id).first()
+        } catch (error) {
+            console.log(error)
+            throw setError(500, "database failure")
+        }
+    }
+
     async isExist(id: number | Partial<T>): Promise<boolean> {
         try {
             const exist = await this.qb().where(id).first();

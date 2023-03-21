@@ -64,7 +64,7 @@ export default class TeamController extends Controller {
 
             const userId = req.user?.id!;
 
-            await this.teamServices.update(userId, +req.params.id, req.body.role)
+            await this.teamServices.update(+req.params.id, req.body.role)
 
             super.setResponseSuccess({
                 res,
@@ -82,7 +82,7 @@ export default class TeamController extends Controller {
 
             const userId = req.user?.id!;
 
-            await this.teamServices.remove(userId, +req.params.id)
+            await this.teamServices.remove(+req.params.id)
 
             super.setResponseSuccess({
                 res,

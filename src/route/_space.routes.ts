@@ -1,8 +1,11 @@
 import Controller, { APIRoute, Methods } from '../app/controller';
 import validation from "../middleware/validation.middleware"
 import { spaceSchema } from '../utils/_space-validation-schema';
-import spacePermission from "../middleware/space-permissions.middleware"
+import PermissionsFactory from "../middleware/permissions.middleware"
 import { paramSchema } from '../utils/_commen-validation-schema';
+
+const Permission = PermissionsFactory.getPermissions("spaces")
+
 
 const routes: (controller: Controller) => APIRoute[] = (controller: any) => {
 
@@ -19,7 +22,10 @@ const routes: (controller: Controller) => APIRoute[] = (controller: any) => {
             path: "/:id",
             method: Methods.GET,
             handler: controller.getSpaceHandler,
-            localMiddleware: [validation(paramSchema, "param"), spacePermission.getSpacePermission],
+            localMiddleware: [
+                validation(paramSchema, "param"),
+                Permission.memberPermissions
+            ],
             auth: true
         },
 
@@ -35,7 +41,11 @@ const routes: (controller: Controller) => APIRoute[] = (controller: any) => {
             path: "/:id",
             method: Methods.PUT,
             handler: controller.updateSpaceHandler,
-            localMiddleware: [validation(paramSchema, "param"), spacePermission.updateAndDeletePermission, validation(spaceSchema)],
+            localMiddleware: [
+                validation(paramSchema, "param"),
+                validation(spaceSchema),
+                Permission.ownerPermissions
+            ],
             auth: true
         },
 
@@ -43,7 +53,10 @@ const routes: (controller: Controller) => APIRoute[] = (controller: any) => {
             path: "/:id",
             method: Methods.DELETE,
             handler: controller.deleteSpaceHandler,
-            localMiddleware: [validation(paramSchema, "param"), spacePermission.updateAndDeletePermission],
+            localMiddleware: [
+                validation(paramSchema, "param"),
+                Permission.ownerPermissions
+            ],
             auth: true
         },
 

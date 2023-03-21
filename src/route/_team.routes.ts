@@ -1,8 +1,15 @@
 import { paramSchema } from './../utils/_commen-validation-schema';
 import Controller, { APIRoute, Methods } from '../app/controller';
 import validation from "../middleware/validation.middleware"
-import spacePermission from "../middleware/space-permissions.middleware"
-import { addMemberSchema, inviteMemberSchema, updateRoleSchema } from '../utils/_team-validation-schema';
+import PermissionsFactory from "../middleware/permissions.middleware"
+import {
+    addMemberSchema,
+    inviteMemberSchema,
+    updateRoleSchema
+} from '../utils/_team-validation-schema';
+
+const Permission = PermissionsFactory.getPermissions("teams")
+
 
 const routes: (controller: Controller) => APIRoute[] = (controller: any) => {
 
@@ -11,7 +18,10 @@ const routes: (controller: Controller) => APIRoute[] = (controller: any) => {
             path: "/invite",
             method: Methods.POST,
             handler: controller.sendInvitationHandler,
-            localMiddleware: [validation(inviteMemberSchema), spacePermission.invitePermission],
+            localMiddleware: [
+                validation(inviteMemberSchema),
+                Permission.adminPermissions
+            ],
             auth: true
         },
 
@@ -27,7 +37,11 @@ const routes: (controller: Controller) => APIRoute[] = (controller: any) => {
             path: "/:id",
             method: Methods.PATCH,
             handler: controller.updateRoleHandler,
-            localMiddleware: [validation(paramSchema, "param"), validation(updateRoleSchema)],
+            localMiddleware: [
+                validation(paramSchema, "param"),
+                validation(updateRoleSchema),
+                Permission.ownerPermissions
+            ],
             auth: true
         },
 
@@ -35,7 +49,10 @@ const routes: (controller: Controller) => APIRoute[] = (controller: any) => {
             path: "/:id",
             method: Methods.DELETE,
             handler: controller.removeMemberHandler,
-            localMiddleware: [validation(paramSchema, "param")],
+            localMiddleware: [
+                validation(paramSchema, "param"),
+                Permission.ownerPermissions
+            ],
             auth: true
         },
 
@@ -43,7 +60,9 @@ const routes: (controller: Controller) => APIRoute[] = (controller: any) => {
             path: "/leave/:id",
             method: Methods.DELETE,
             handler: controller.leaveTeamHandler,
-            localMiddleware: [validation(paramSchema, "param")],
+            localMiddleware: [
+                validation(paramSchema, "param")
+            ],
             auth: true
         },
     ]
