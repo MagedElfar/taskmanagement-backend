@@ -11,7 +11,9 @@ import {
     updateTaskStatus
 } from '../utils/_task-validation-schema';
 
-const Permission = PermissionsFactory.getPermissions("tasks")
+const Permission = PermissionsFactory.getPermissions("tasks");
+const AssignPermission = PermissionsFactory.getPermissions("assignees");
+const AttachPermission = PermissionsFactory.getPermissions("attachments")
 
 const routes: (controller: Controller) => APIRoute[] = (controller: any) => {
 
@@ -99,7 +101,10 @@ const routes: (controller: Controller) => APIRoute[] = (controller: any) => {
             path: "/assign/:id",
             method: Methods.DELETE,
             handler: controller.unassignTaskHandler,
-            localMiddleware: [validation(paramSchema, "param")],
+            localMiddleware: [
+                validation(paramSchema, "param"),
+                AssignPermission.memberPermissions
+            ],
             auth: true
         },
 
@@ -107,7 +112,11 @@ const routes: (controller: Controller) => APIRoute[] = (controller: any) => {
             path: "/attachment",
             method: Methods.POST,
             handler: controller.uploadAttachmentHandler,
-            localMiddleware: [Multer.localUpload().array("file"), validation(taskAttachmentSchema)],
+            localMiddleware: [
+                Multer.localUpload().array("file"),
+                validation(taskAttachmentSchema),
+                Permission.memberPermissions
+            ],
             auth: true
         },
 
@@ -115,7 +124,10 @@ const routes: (controller: Controller) => APIRoute[] = (controller: any) => {
             path: "/attachment/:id",
             method: Methods.DELETE,
             handler: controller.deleteAttachmentHandler,
-            localMiddleware: [validation(paramSchema, "param")],
+            localMiddleware: [
+                validation(paramSchema, "param"),
+                AttachPermission.memberPermissions
+            ],
             auth: true
         }
     ]

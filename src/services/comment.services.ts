@@ -1,23 +1,15 @@
 import { CommentRepository, IComment } from './../model/comment.model';
 import { Inject, Service } from "typedi";
 import { setError } from '../utils/error-format';
-import TaskServices from './task.services';
-import TakPermission from '../middleware/task-permissions.middleware';
 
 @Service()
 export default class CommentServices {
     private readonly commentRepository: CommentRepository;
-    private readonly taskService: TaskServices;
-    private readonly takPermission: TakPermission;
 
     constructor(
-        @Inject() takPermission: TakPermission,
         @Inject() commentRepository: CommentRepository,
-        @Inject() taskService: TaskServices,
     ) {
         this.commentRepository = commentRepository;
-        this.taskService = taskService;
-        this.takPermission = takPermission;
     }
 
     async _find(taskId: number, querySearch: { limit: number, page: number }) {
@@ -30,8 +22,6 @@ export default class CommentServices {
 
     async find(userId: number, taskId: number, querySearch: { limit: number, page: number }) {
         try {
-            await this.taskService.getTask(userId, taskId!);
-
             return await this.commentRepository.find({ taskId }, querySearch)
         } catch (error) {
             throw error
@@ -44,8 +34,6 @@ export default class CommentServices {
         try {
 
             const media: any = [];
-
-            await this.taskService.getTask(userId, +data.taskId!);
 
             return await this.commentRepository.create({
                 ...data,

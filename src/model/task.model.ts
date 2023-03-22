@@ -40,6 +40,8 @@ export class TakRepository extends BaseRepository<ITask>{
 
     async find(item: Partial<ITask>, option: any): Promise<any> {
 
+        console.log("option", option)
+
         const {
             user = null,
             userId,
@@ -50,11 +52,18 @@ export class TakRepository extends BaseRepository<ITask>{
             orderBy = "created_at",
             order = "asc",
             status,
-            project
+            project,
+            parentId
         } = option
         try {
             const query = this.db(this.tableName)
-                .leftJoin("assignees", "assignees.taskId", "=", "tasks.id")
+
+
+            if (parentId) {
+                return await query.where({ parentId }).select("*")
+            }
+
+            query.leftJoin("assignees", "assignees.taskId", "=", "tasks.id")
                 .leftJoin("teams as member", "member.id", "=", "assignees.memberId")
                 .select("tasks.*")
 
@@ -97,62 +106,26 @@ export class TakRepository extends BaseRepository<ITask>{
         }
     }
 
-    async findTask(id: number | Partial<ITask>): Promise<ITask> {
-        try {
-            const query = this.qb()
-
-                .select(
-                    "tasks.*",
-
-                )
-
-
-            if (typeof id === 'number') {
-                query.where('tasks.id', id)
-            } else {
-                Object.keys(id).forEach(key => {
-                    id[`tasks.${key}`] = id[key];
-
-                    delete id[key]
-                })
-                query.where(id)
-            }
-
-
-            return await query.first()
-        } catch (error) {
-            console.log(error)
-            throw setError(500, "database failure")
-        }
-    }
-
     async findOne(id: number | Partial<ITask>): Promise<ITask> {
         try {
             const query = this.qb()
-                .leftJoin("tasks as subTasks", "subTasks.parentId", "=", "tasks.id")
                 .leftJoin("users as user", "user.id", "=", "tasks.userId")
                 .leftJoin("profiles_images as userImage", "userImage.userId", "=", "user.id")
                 .leftJoin("assignees as assign", "assign.taskId", "=", "tasks.id")
                 .leftJoin("teams as member", "member.id", "=", "assign.memberId")
                 .leftJoin("users as assignTo", "assignTo.id", "=", "member.userId")
                 .leftJoin("profiles_images as assignToImage", "assignToImage.userId", "=", "assignTo.id")
-                .leftJoin("task_attachments as attachments", "attachments.taskId", "=", "tasks.id")
                 .leftJoin("projects as project", "project.id", "=", "tasks.projectId")
 
                 .select(
                     "tasks.*",
-                    "subTasks.title",
-                    "subTasks.id",
                     "user.username",
-                    "userImage.image_url as url",
-                    "assign.id",
-                    "assignTo.username",
-                    "assignToImage.image_url as url",
-                    "attachments.*",
-                    "project.id",
-                    "project.name"
+                    "userImage.image_url as user_url",
+                    "assign.id as assignId",
+                    "assignTo.username as assignToImageName",
+                    "assignToImage.image_url as assignToImage_url",
+                    "project.name as projectName"
                 )
-                .options({ nestTables: true })
 
 
             if (typeof id === 'number') {
@@ -168,45 +141,8 @@ export class TakRepository extends BaseRepository<ITask>{
             }
 
 
-            return await query.then((result) => {
-                const task = oneToManyMapped(result, "tasks", {
-                    subTasks: "oneToMany",
-                    user: "oneToOne",
-                    userImage: "oneToOne",
-                    assign: "oneToOne",
-                    assignTo: "oneToOne",
-                    assignToImage: "oneToOne",
-                    project: "oneToOne",
-                    attachments: "oneToMany"
-                });
+            return await query.first()
 
-                if (task) {
-                    task.user = {
-                        ...task.user,
-                        userImage: task.userImage?.url
-                    }
-
-                    task.assign = task.assign.id ? {
-                        ...task.assign,
-                        username: task.assignTo.username,
-                        userImage: task.assignToImage?.url
-                    } : null
-
-                    task.project = task.assign?.id ? task.project : null;
-
-                    const { userImage, assignTo, assignToImage, ...others } = task
-
-                    others.subTasks = others.subTasks.filter((item: any) => item.id)
-
-                    others.attachments = others.attachments.filter((item: any) => item.id)
-
-                    return others
-
-                }
-
-
-                return task
-            })
         } catch (error) {
             console.log(error)
             throw setError(500, "database failure")

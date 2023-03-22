@@ -4,23 +4,27 @@ import routes from "../route/_space.routes";
 import { Inject } from "typedi";
 import SpaceServices from "../services/space.services";
 import ProjectServices from "../services/project.services";
+import TeamServices from "../services/team.service";
 
 
 export default class SpaceController extends Controller {
     protected routes: APIRoute[];
     private readonly spaceServices: SpaceServices
     private readonly projectServices: ProjectServices
+    private readonly teamServices: TeamServices
 
 
     constructor(
         path: string,
         @Inject() spaceServices: SpaceServices,
-        @Inject() projectServices: ProjectServices
+        @Inject() projectServices: ProjectServices,
+        @Inject() teamServices: TeamServices
     ) {
         super(path);
         this.routes = routes(this);
         this.spaceServices = spaceServices;
-        this.projectServices = projectServices
+        this.projectServices = projectServices;
+        this.teamServices = teamServices
     }
 
     async getSpacesHandler(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -55,6 +59,8 @@ export default class SpaceController extends Controller {
 
             const space = await this.spaceServices.findOne(+id);
 
+            const { team } = await this.teamServices.find({ space: +id! }, { limit: 5, page: 1 })
+
             const { projects } = await this.projectServices._find(+id)
 
             super.setResponseSuccess({
@@ -62,6 +68,7 @@ export default class SpaceController extends Controller {
                 status: 200,
                 data: {
                     space,
+                    team,
                     projects
                 }
             })

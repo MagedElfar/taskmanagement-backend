@@ -4,6 +4,7 @@ import validation from "../middleware/validation.middleware"
 import PermissionsFactory from "../middleware/permissions.middleware"
 import {
     addMemberSchema,
+    getTeamSchema,
     inviteMemberSchema,
     updateRoleSchema
 } from '../utils/_team-validation-schema';
@@ -14,6 +15,16 @@ const Permission = PermissionsFactory.getPermissions("teams")
 const routes: (controller: Controller) => APIRoute[] = (controller: any) => {
 
     const r: APIRoute[] = [
+        {
+            path: "/",
+            method: Methods.GET,
+            handler: controller.getTeamHandler,
+            localMiddleware: [
+                validation(getTeamSchema, "query"),
+                Permission.memberPermissions
+            ],
+            auth: true
+        },
         {
             path: "/invite",
             method: Methods.POST,

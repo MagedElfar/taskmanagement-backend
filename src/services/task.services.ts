@@ -1,28 +1,29 @@
-import { AssigneeRepository, IAssignee } from './../model/assignee.model';
+import { ITaskAttachment } from './../model/task_attachments.model';
+import { IAssignee } from './../model/assignee.model';
 import { TakRepository, ITask, TaskStatus } from './../model/task.model';
-import { Inject, Service } from "typedi";
+import Container, { Inject, Service } from "typedi";
 import { setError } from '../utils/error-format';
 import TeamServices from './team.service';
-import { Role } from "../model/team.model";
-import TakPermission from '../middleware/task-permissions.middleware';
 import AssigneeServices from './assignee.services';
 import ActivityServices from './activity.services';
 import ProjectServices from './project.services';
+import TaskAttachmentServices from './task_attachments.services';
+import StorageService from './storage.services';
 
 @Service()
 export default class TaskServices {
     private readonly taskRepo: TakRepository;
-    private readonly takPermission: TakPermission;
     private readonly assigneeServices: AssigneeServices;
     private readonly teamService: TeamServices;
     private readonly activityServices: ActivityServices;
-    private readonly projectServices: ProjectServices
+    private readonly projectServices: ProjectServices;
+    private readonly taskAttachmentServices: TaskAttachmentServices = Container.get(TaskAttachmentServices);
+    private readonly storageService: StorageService = Container.get(StorageService)
 
 
 
     constructor(
         @Inject() taskRepo: TakRepository,
-        @Inject() takPermission: TakPermission,
         @Inject() assigneeServices: AssigneeServices,
         @Inject() teamService: TeamServices,
         @Inject(type => ActivityServices) activityServices: ActivityServices,
@@ -30,11 +31,10 @@ export default class TaskServices {
 
     ) {
         this.taskRepo = taskRepo;
-        this.takPermission = takPermission;
         this.assigneeServices = assigneeServices;
         this.teamService = teamService;
-        this.activityServices = activityServices,
-            this.projectServices = projectServices
+        this.activityServices = activityServices;
+        this.projectServices = projectServices
     }
 
     QueryServices() {
@@ -53,38 +53,20 @@ export default class TaskServices {
         }
     }
 
-    async getTask(userId: number, taskId: number) {
-        try {
-            const task = await this.taskRepo.findTask(taskId);
-
-            if (!task) throw setError(404, "not found")
-
-            const hasPermission = await this.takPermission.userPermission(task.spaceId, userId);
-
-            if (!hasPermission) throw setError(403, "Forbidden")
-
-            return task;
-        } catch (error) {
-            throw error;
-        }
-    }
-
     async find(querySearch: {
-        limit: number,
-        term: string,
-        page: number,
-        userId: number,
+        parentId?: number
+        limit?: number,
+        term?: string,
+        page?: number,
+        userId?: number,
         space?: number,
         project?: number,
-        user: any,
-        orderBy: string,
-        order: string,
-        status: string
+        user?: any,
+        orderBy?: string,
+        order?: string,
+        status?: string
     }) {
         try {
-
-
-
             return await this.taskRepo.find({}, querySearch)
         } catch (error) {
             throw error
@@ -190,14 +172,17 @@ export default class TaskServices {
         }
     }
 
-    async delete(userId: number, taskId: number) {
+    async delete(taskId: number) {
         try {
 
-            const task = await this.checkTask(taskId)
+            const att: ITaskAttachment[] = await this.taskAttachmentServices.QueryServices()
+                .where({ taskId }).select("*");
 
-            const hasPermission = await this.takPermission.adminPermission(task.spaceId, userId);
-
-            if (!hasPermission && task.userId !== userId) throw setError(403, "Forbidden")
+            if (att.length > 0) {
+                await Promise.all(att.map(async (item: ITaskAttachment) => {
+                    await this.storageService.delete(item.storage_key)
+                }))
+            }
 
             await this.taskRepo.delete(taskId);
 
@@ -242,13 +227,6 @@ export default class TaskServices {
         try {
 
             const assign = await this.assigneeServices.findOne(assignmentId);
-
-
-            if (!assign) throw setError(400, `this user not assign for this task`);
-
-            const hasPermission = await this.takPermission.adminPermission(assign.spaceId, userId)
-
-            if (!hasPermission) throw setError(403, "Forbidden")
 
             await this.assigneeServices.delete(assignmentId)
 

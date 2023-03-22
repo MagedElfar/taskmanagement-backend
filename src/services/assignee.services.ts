@@ -16,6 +16,9 @@ export default class AssigneeServices {
 
     }
 
+    QueryServices() {
+        return this.assigneeRepository.qb()
+    }
 
     async findOne(data: Partial<IAssignee> | number) {
         try {

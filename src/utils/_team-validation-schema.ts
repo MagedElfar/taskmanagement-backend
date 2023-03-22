@@ -26,8 +26,17 @@ const updateRoleSchema = Joi.object({
     role: Joi.string().optional().valid("admin", "member")
 })
 
+
+const getTeamSchema = Joi.object({
+    space: Joi.number()
+        .required(),
+    limit: Joi.number().optional(),
+    page: Joi.number().optional(),
+})
+
 export {
     inviteMemberSchema,
     addMemberSchema,
-    updateRoleSchema
+    updateRoleSchema,
+    getTeamSchema
 }

@@ -22,6 +22,35 @@ export class TeamRepository extends BaseRepository<ITeam>{
         super("teams")
     }
 
+    async find(item: Partial<ITeam>, option: any): Promise<any> {
+
+        const { limit = 5, page = 1 } = option
+        try {
+            const query = this.db(this.tableName)
+                .leftJoin("users as user", "user.id", "=", "teams.userId")
+                .leftJoin("profiles_images as userImg", "userImg.userId", "=", "user.id")
+                .select(
+                    "teams.*",
+                    "userImg.image_url as userImage",
+                    "user.username",
+                    "user.email as userEmail"
+                )
+                .where("teams.space", "=", item.space!)
+
+            const team = await query.clone().limit(limit).offset((page - 1) * limit);
+
+            const count = await query.clone().count('teams.id as CNT').first();
+
+            return {
+                team,
+                count: count?.CNT
+            }
+        } catch (error) {
+            console.log(error)
+            throw setError(500, "database failure")
+        }
+    }
+
     async findOne(id: number | Partial<ITeam>): Promise<any> {
         try {
             const query = this.qb()

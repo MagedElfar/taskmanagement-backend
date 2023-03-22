@@ -37,7 +37,8 @@ const routes: Controller[] = [
     new SpaceController(
         "/spaces",
         Container.get(SpaceServices),
-        Container.get(ProjectServices)
+        Container.get(ProjectServices),
+        Container.get(TeamServices)
     ),
 
     new TeamController(

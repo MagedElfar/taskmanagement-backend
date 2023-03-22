@@ -108,6 +108,9 @@ export default class TaskController extends Controller {
 
             const task = await this.taskServices.findOne(userId, +id!);
 
+            const subTasks = await this.taskServices.find({ parentId: +id! });
+
+
             const { comments } = await this.commentServices._find(+id, {
                 limit: 3,
                 page: 1
@@ -123,6 +126,7 @@ export default class TaskController extends Controller {
                 status: 200,
                 data: {
                     task,
+                    subTasks,
                     comments,
                     activities
                 }
@@ -175,11 +179,9 @@ export default class TaskController extends Controller {
     async deleteTaskHandler(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
 
-            const userId = req.user?.id!;
-
             const { id } = req.params;
 
-            const task = await this.taskServices.delete(userId, +id!)
+            const task = await this.taskServices.delete(+id!)
 
             super.setResponseSuccess({
                 res,

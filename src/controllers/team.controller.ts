@@ -19,6 +19,28 @@ export default class TeamController extends Controller {
         this.teamServices = teamServices
     }
 
+    async getTeamHandler(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+
+            const { limit = 10, page = 1, space } = req.query
+
+            const data = await this.teamServices.find({ space: +space! }, {
+                limit: +limit,
+                page: +page,
+            });
+
+            super.setResponseSuccess({
+                res,
+                status: 200,
+                data: { data }
+            })
+
+        } catch (error) {
+            next(error)
+        }
+    };
+
+
     async sendInvitationHandler(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
 
