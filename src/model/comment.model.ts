@@ -1,3 +1,4 @@
+import { GetCommentsDto } from './../dto/comment.dto';
 import { Service } from 'typedi';
 import Model from "../app/model";
 import BaseRepository from "../plugins/mysqldb";
@@ -16,10 +17,7 @@ export class CommentRepository extends BaseRepository<IComment>{
         super("comments")
     }
 
-    async find(item: Partial<IComment>, option: any): Promise<any> {
-
-        const { limit = 10, page = 1 } = option;
-
+    async find(getCommentsDto: GetCommentsDto): Promise<any> {
         try {
             const query = this.db(this.tableName)
                 .leftJoin("users as user", "user.id", "=", "comments.userId")
@@ -29,18 +27,18 @@ export class CommentRepository extends BaseRepository<IComment>{
                     "user.username",
                     "userImage.image_url as userImage"
                 )
-                .where(item)
+                .where("taskId", "=", getCommentsDto.taskId)
 
-            const comments = await query.clone()
-                .limit(limit)
-                .offset((page - 1) * limit)
+            const data = await query.clone()
+                .limit(getCommentsDto.limit)
+                .offset((getCommentsDto.page - 1) * getCommentsDto.limit)
                 .orderBy("created_at", "desc");
 
             const count = await query.clone().count('comments.id as CNT').first();
 
 
             return {
-                comments,
+                data,
                 count: count?.CNT
             }
         } catch (error) {

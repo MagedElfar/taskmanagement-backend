@@ -1,3 +1,4 @@
+import { GetTasksDto } from './../dto/task.dto';
 import { Service } from 'typedi';
 import Model from "../app/model";
 import BaseRepository, { oneToManyMapped } from "../plugins/mysqldb";
@@ -7,14 +8,14 @@ export enum TaskStatus {
     TO_DO = "to do",
     IN_PROGRESS = "in progress",
     IN_REVIEW = "in review",
-    COMPLETED = "completed",
+    DONE = "done",
     BLOCKED = "blocked"
 }
 
 export enum TaskPRIORITY {
     LOW = "low",
     MEDIUM = "medium",
-    HEIGH = "heigh"
+    HEIGH = "heigh",
 }
 
 export interface ITask extends Model {
@@ -26,7 +27,8 @@ export interface ITask extends Model {
     spaceId: number;
     userId: number;
     projectId?: number,
-    parentId?: number
+    parentId?: number,
+    is_complete?: boolean
 }
 
 
@@ -38,26 +40,14 @@ export class TakRepository extends BaseRepository<ITask>{
 
 
 
-    async find(item: Partial<ITask>, option: any): Promise<any> {
+    async find(getTaskDto: GetTasksDto): Promise<any> {
 
-        console.log("option", option)
-
-        const {
-            user = null,
-            userId,
-            limit = 10,
-            page = 1,
-            term = null,
-            space = null,
-            orderBy = "created_at",
-            order = "asc",
-            status,
-            project,
-            parentId
-        } = option
         try {
             const query = this.db(this.tableName)
 
+            const { user, userId, parentId, page, limit, order = "desc", orderBy = "created_at", ...others } = getTaskDto
+
+            console.log(getTaskDto)
 
             if (parentId) {
                 return await query.where({ parentId }).select("*")
@@ -68,36 +58,35 @@ export class TakRepository extends BaseRepository<ITask>{
                 .select("tasks.*")
 
             if (user) {
-                query.where("member.userId", "=", userId)
-                    .orWhere("tasks.userId", "=", userId)
+                query.where("member.userId", "=", userId!)
+                    .orWhere("tasks.userId", "=", userId!)
             }
 
-            if (space) {
-                query.andWhere("tasks.spaceId", "=", space)
+            Object.keys(others).forEach((key: string) => {
+                if (key === "term") {
+                    query.andWhere("tasks.title", "like", `%${others[key]}%`)
+                    return
+                }
+
+                query.andWhere(`tasks.${key}`, "=", others[key])
+
+            })
+
+            const tasksQuery = query.clone()
+
+            if (limit) {
+                tasksQuery.limit(limit)
+                    .offset((page! - 1) * limit)
             }
 
-            if (status) {
-                query.andWhere("tasks.status", "=", status)
-            }
 
-            if (term) {
-                query.andWhere("tasks.title", "like", `%${term}%`)
-            }
-
-            if (project) {
-                query.andWhere("tasks.projectId", "=", project)
-            }
-
-            const tasks = await query.clone()
-                .limit(limit)
-                .offset((page - 1) * limit)
-                .orderBy(orderBy, order);
+            const data = await tasksQuery.orderBy(orderBy, order);
 
             const count = await query.clone().count('tasks.id as CNT').first();
 
 
             return {
-                tasks,
+                data,
                 count: count?.CNT
             }
         } catch (error) {

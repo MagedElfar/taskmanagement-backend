@@ -6,7 +6,9 @@ export const up = function (knex: Knex) {
             table.increments();
             table.string("title").notNullable();
             table.string("description").nullable();
-            table.enu("status", ["to do", "in progress", "in review", "completed", "blocked"]).defaultTo("to do")
+            table.enu("status", ["to do", "in progress", "in review", "done", "blocked"])
+                .defaultTo("to do");
+            table.boolean("is_complete").defaultTo(false)
             table.enu("priority", ["low", "medium", "heigh"]).defaultTo("low")
             table.date("due_date").nullable();
 

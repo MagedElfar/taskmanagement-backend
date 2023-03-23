@@ -14,7 +14,7 @@ const taskSchema = Joi.object({
     priority: Joi.string().optional().valid(...Object.values(TaskPRIORITY)),
     due_date: Joi.date().format('YYYY-MM-DD').optional().greater(date),
     spaceId: Joi.number().required(),
-    parentId: Joi.number().optional(),
+    parentId: Joi.number().allow(null).optional(),
     projectId: Joi.number().allow(null).optional(),
 })
 
@@ -33,18 +33,17 @@ const taskAttachmentSchema = Joi.object({
 })
 
 const getTaskSSchema = Joi.object({
-    space: Joi.number().optional(),
+    spaceId: Joi.number().optional(),
     project: Joi.number(),
     term: Joi.string().optional(),
-    pages: Joi.number().optional(),
+    page: Joi.number()
+        .when('limit', { is: Joi.exist(), then: Joi.required(), otherwise: Joi.optional() }),
     limit: Joi.number().optional(),
     user: Joi.boolean().optional().valid(true),
-    // .when(['project', { is: Joi.exist(), then: Joi.required(), otherwise: Joi.optional() }])
-    // .when('space', { is: Joi.exist(), then: Joi.required(), otherwise: Joi.optional() }),
     orderBy: Joi.string().optional().valid("created_at", "due_date"),
     order: Joi.string().optional().valid("desc", "asc"),
     status: Joi.string().optional().valid(...Object.values(TaskStatus)),
-}).or('space', 'user');
+}).or('spaceId', 'user');
 
 export {
     taskSchema,

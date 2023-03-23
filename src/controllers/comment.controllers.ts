@@ -25,9 +25,8 @@ export default class CommentController extends Controller {
 
             const { limit = 10, page = 1, term = "", taskId = 0 } = req.query;
 
-            const userId = req.user?.id!;
-
-            const data = await this.commentServices.find(userId, +taskId, {
+            const data = await this.commentServices.find({
+                taskId: +taskId,
                 limit: +limit,
                 page: +page,
             });

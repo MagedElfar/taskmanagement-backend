@@ -75,6 +75,18 @@ const routes: (controller: Controller) => APIRoute[] = (controller: any) => {
             auth: true
         },
 
+
+        {
+            path: "/complete/:id",
+            method: Methods.PATCH,
+            handler: controller.markTaskCompleteHandler,
+            localMiddleware: [
+                validation(paramSchema, "param"),
+                Permission.memberPermissions
+            ],
+            auth: true
+        },
+
         {
             path: "/:id",
             method: Methods.DELETE,

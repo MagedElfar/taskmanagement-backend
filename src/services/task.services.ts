@@ -1,3 +1,4 @@
+import { GetTasksDto } from './../dto/task.dto';
 import { ITaskAttachment } from './../model/task_attachments.model';
 import { IAssignee } from './../model/assignee.model';
 import { TakRepository, ITask, TaskStatus } from './../model/task.model';
@@ -53,21 +54,9 @@ export default class TaskServices {
         }
     }
 
-    async find(querySearch: {
-        parentId?: number
-        limit?: number,
-        term?: string,
-        page?: number,
-        userId?: number,
-        space?: number,
-        project?: number,
-        user?: any,
-        orderBy?: string,
-        order?: string,
-        status?: string
-    }) {
+    async find(getTasksDto: GetTasksDto) {
         try {
-            return await this.taskRepo.find({}, querySearch)
+            return await this.taskRepo.find(getTasksDto)
         } catch (error) {
             throw error
         }
@@ -164,6 +153,26 @@ export default class TaskServices {
             await this.activityServices.addActivity({
                 taskId: task.id,
                 activity: `update task status to ${status}`,
+                user1_Id: userId
+            })
+
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async markTaskCompleat(userId: number, taskId: number) {
+        try {
+
+            let task = await this.QueryServices().where("id", "=", taskId).first();
+
+            await this.taskRepo.update(taskId, {
+                is_complete: !task.is_complete
+            });
+
+            await this.activityServices.addActivity({
+                taskId: task.id,
+                activity: `mark this task ${!task.is_complete ? "as complete" : "as incomplete"}`,
                 user1_Id: userId
             })
 

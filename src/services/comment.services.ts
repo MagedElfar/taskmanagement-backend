@@ -1,3 +1,4 @@
+import { GetCommentsDto } from './../dto/comment.dto';
 import { CommentRepository, IComment } from './../model/comment.model';
 import { Inject, Service } from "typedi";
 import { setError } from '../utils/error-format';
@@ -12,17 +13,10 @@ export default class CommentServices {
         this.commentRepository = commentRepository;
     }
 
-    async _find(taskId: number, querySearch: { limit: number, page: number }) {
-        try {
-            return await this.commentRepository.find({ taskId }, querySearch)
-        } catch (error) {
-            throw error
-        }
-    }
 
-    async find(userId: number, taskId: number, querySearch: { limit: number, page: number }) {
+    async find(getCommentsDto: GetCommentsDto) {
         try {
-            return await this.commentRepository.find({ taskId }, querySearch)
+            return await this.commentRepository.find(getCommentsDto)
         } catch (error) {
             throw error
         }

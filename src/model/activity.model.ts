@@ -33,7 +33,7 @@ export class ActivityRepository extends BaseRepository<IActivity>{
                 )
                 .where(item)
 
-            const activities = await query.clone()
+            const data = await query.clone()
                 .limit(limit)
                 .offset((page - 1) * limit)
                 .orderBy("created_at", "desc");
@@ -42,7 +42,7 @@ export class ActivityRepository extends BaseRepository<IActivity>{
 
 
             return {
-                activities,
+                data,
                 count: count?.CNT
             }
         } catch (error) {

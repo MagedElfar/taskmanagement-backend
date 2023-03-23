@@ -34,38 +34,17 @@ export default class TaskController extends Controller {
     async getTasksHandler(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
 
-
-            const {
-                limit = 10,
-                page = 1,
-                status = "",
-                term = "",
-                user,
-                space,
-                project,
-                orderBy = "created_at",
-                order = "asc"
-            } = req.query;
-
             const userId = req.user?.id!;
 
-            const data = await this.taskServices.find({
-                userId,
-                limit: +limit,
-                page: +page,
-                term: term.toString(),
-                orderBy: orderBy?.toString(),
-                order: order.toString(),
-                space: space ? +space : undefined,
-                project: project ? +project : undefined,
-                user,
-                status: status.toString()
+            const tasks = await this.taskServices.find({
+                ...req.query,
+                userId
             });
 
             super.setResponseSuccess({
                 res,
                 status: 200,
-                data: { data }
+                data: { tasks }
             })
 
         } catch (error) {
@@ -111,12 +90,13 @@ export default class TaskController extends Controller {
             const subTasks = await this.taskServices.find({ parentId: +id! });
 
 
-            const { comments } = await this.commentServices._find(+id, {
-                limit: 3,
-                page: 1
+            const comments = await this.commentServices.find({
+                limit: 5,
+                page: 1,
+                taskId: +id!
             })
 
-            const { activities } = await this.activityServices._find(+id, {
+            const activities = await this.activityServices._find(+id, {
                 limit: 3,
                 page: 1
             })
@@ -165,6 +145,25 @@ export default class TaskController extends Controller {
             const { id } = req.params;
 
             await this.taskServices.updateStatus(userId, +id!, req.body.status)
+
+            super.setResponseSuccess({
+                res,
+                status: 200,
+            })
+
+        } catch (error) {
+            next(error)
+        }
+    };
+
+    async markTaskCompleteHandler(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+
+            const userId = req.user?.id!;
+
+            const { id } = req.params;
+
+            await this.taskServices.markTaskCompleat(userId, +id!)
 
             super.setResponseSuccess({
                 res,
