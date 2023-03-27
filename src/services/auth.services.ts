@@ -67,8 +67,9 @@ export default class AuthServices {
                 }
             }
 
+            const { password, ...others } = user
             return {
-                user,
+                user: others,
                 accessToken,
                 refreshToken
             }
@@ -97,8 +98,10 @@ export default class AuthServices {
                 token: refreshToken
             })
 
+            const { password, ...others } = user
+
             return {
-                user,
+                user: others,
                 accessToken,
                 refreshToken
             }

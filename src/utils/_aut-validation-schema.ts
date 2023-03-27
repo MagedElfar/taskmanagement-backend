@@ -56,7 +56,7 @@ const forgetPasswordRestSchema = Joi.object({
         .required()
         .regex(/^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*\W)(?!.* ).{8,16}$/)
         .messages({
-            "string.pattern.base": "Invalid Password Format Provided ( Must be at least 8 characters, 1 number and at least one uppercase character )"
+            "string.pattern.base": "Invalid Password Format Provided ( Must be at least 8 characters, 1 uppercase, 1 lowercase, 1 number, and 1 special character )"
         }),
 
     password_confirmation: Joi.any()

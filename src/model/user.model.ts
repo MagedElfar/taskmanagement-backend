@@ -21,6 +21,14 @@ export class UserRepository extends BaseRepository<IUser>{
             const query = this.db(this.tableName)
                 .leftJoin("profiles_images as image", "image.userId", "=", "users.id")
                 .leftJoin("profiles as profile", "users.id", "=", "profile.userId")
+                .select(
+                    "users.*",
+                    "profile.first_name",
+                    "profile.last_name",
+                    "profile.phone",
+                    "profile.gender",
+                    "image.image_url"
+                )
 
             typeof id === 'number'
                 ? query.where('users.id', id)
