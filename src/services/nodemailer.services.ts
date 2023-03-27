@@ -27,7 +27,7 @@ export default class NodeMailerServices {
                 subject: 'Forget Password',
                 html: `
                     <h3>Please click on the link blow to rest your password</h3>
-                    <a href = ${config.clientUrl}/token=${token}>Rest Password</a>
+                    <a href = ${config.clientUrl}/forgot-password?token=${token}>Rest Password</a>
                 `
             };
 

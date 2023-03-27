@@ -44,7 +44,7 @@ export class UserRepository extends BaseRepository<IUser>{
                 })
 
         } catch (error) {
-            console.log("error")
+            console.log(error)
             throw setError(500, "database failure")
         }
     }

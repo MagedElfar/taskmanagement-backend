@@ -25,9 +25,9 @@ const updateUserSchema = Joi.object({
 
 
 const profileSchema = Joi.object({
-    first_name: Joi.string().optional(),
-    last_name: Joi.string().optional(),
-    phone: Joi.string().optional(),
+    first_name: Joi.string().allow("").optional(),
+    last_name: Joi.string().allow("").optional(),
+    phone: Joi.string().allow("").optional(),
     gender: Joi.string().optional().valid(...Object.values(Gender))
 })
 

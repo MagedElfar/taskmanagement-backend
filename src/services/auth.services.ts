@@ -183,6 +183,8 @@ export default class AuthServices {
 
             const newPassword = await bcrypt.hash(password, 10);
 
+            console.log(data.id)
+
             await this.userService.update(data.id, { password: newPassword });
 
             return;

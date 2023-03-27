@@ -26,7 +26,8 @@ export default class UserServices {
                 .where(id)
                 .first();
         } catch (error) {
-            throw error
+            console.log(error)
+            throw setError(500, "database failure")
         }
     }
 
@@ -56,11 +57,11 @@ export default class UserServices {
 
     async update(id: number, data: Partial<IUser>) {
         try {
-            let user = await this.findUser({ username: data.username });
+            let user = await this.findUser({ username: data?.username || '' });
 
             if (user && user.id !== id) throw setError(400, "username is already used")
 
-            user = await this.findUser({ email: data.email });
+            user = await this.findUser({ email: data?.email || '' });
 
             if (user && user.id !== id) throw setError(400, "email is already used")
 
