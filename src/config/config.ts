@@ -31,7 +31,7 @@ const conf = {
     secret: process.env.COOKIE_SECRET,
     option: {
       httpOnly: true,
-      // secure: true,
+      secure: true,
       signed: true,
       maxAge: eval(process.env.COOKIE_MAX_AGE!) * 1000,
       sameSite: "none" as const,

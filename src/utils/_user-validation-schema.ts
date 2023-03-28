@@ -31,7 +31,26 @@ const profileSchema = Joi.object({
     gender: Joi.string().optional().valid(...Object.values(Gender))
 })
 
+const changePasswordRestSchema = Joi.object({
+    new_password: Joi.string()
+        .required()
+        .regex(/^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*\W)(?!.* ).{8,16}$/)
+        .messages({
+            "string.pattern.base": "Invalid Password Format Provided ( Must be at least 8 characters, 1 uppercase, 1 lowercase, 1 number, and 1 special character )"
+        }),
+
+    new_password_confirmation: Joi.any()
+        .equal(Joi.ref('new_password'))
+        .required()
+        .messages({ 'any.only': 'Passwords does not match' }),
+
+    password: Joi.string()
+        .required()
+})
+
+
 export {
     profileSchema,
-    updateUserSchema
+    updateUserSchema,
+    changePasswordRestSchema
 }

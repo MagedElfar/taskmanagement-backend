@@ -118,4 +118,19 @@ export default class UserController extends Controller {
             next(error)
         }
     };
+
+    async changePasswordHandler(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+
+            const id = req.user?.id;
+
+
+            await this.userServices.changePassword(+id!, req.body)
+
+            super.setResponseSuccess({ res, status: 200, message: "user password updated successfully" })
+
+        } catch (error) {
+            next(error)
+        }
+    };
 }

@@ -1,6 +1,6 @@
 import Controller, { APIRoute, Methods } from '../app/controller';
 import Multer from '../middleware/multer.middleware';
-import { profileSchema, updateUserSchema } from '../utils/_user-validation-schema';
+import { changePasswordRestSchema, profileSchema, updateUserSchema } from '../utils/_user-validation-schema';
 import validation from "../middleware/validation.middleware"
 
 const routes: (controller: Controller) => APIRoute[] = (controller: any) => {
@@ -19,6 +19,14 @@ const routes: (controller: Controller) => APIRoute[] = (controller: any) => {
             method: Methods.PUT,
             handler: controller.updateUserHandler,
             localMiddleware: [validation(updateUserSchema)],
+            auth: true
+        },
+
+        {
+            path: "/password",
+            method: Methods.PATCH,
+            handler: controller.changePasswordHandler,
+            localMiddleware: [validation(changePasswordRestSchema)],
             auth: true
         },
 
