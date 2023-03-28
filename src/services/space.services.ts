@@ -18,7 +18,7 @@ export default class SpaceServices {
         this.tramServices = tramServices
     }
 
-    async find(querySearch: { limit: number, term: string, page: number, userId: number }) {
+    async find(querySearch: { limit: number, term?: string, page: number, userId: number }) {
         try {
             return await this.spaceRepo.find({}, querySearch)
         } catch (error) {

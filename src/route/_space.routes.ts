@@ -19,6 +19,14 @@ const routes: (controller: Controller) => APIRoute[] = (controller: any) => {
         },
 
         {
+            path: "/user/init",
+            method: Methods.GET,
+            handler: controller.getInitSpaceHandler,
+            localMiddleware: [],
+            auth: true
+        },
+
+        {
             path: "/:id",
             method: Methods.GET,
             handler: controller.getSpaceHandler,
