@@ -59,7 +59,7 @@ export default class SpaceController extends Controller {
 
             const space = await this.spaceServices.findOne(+id);
 
-            const { team } = await this.teamServices.find({ space: +id! })
+            const { team } = await this.teamServices.find({ space: +id! }, {})
 
             const { projects } = await this.projectServices._find(+id)
 
@@ -99,7 +99,7 @@ export default class SpaceController extends Controller {
                 })
             } else {
                 const space = spaces[0];
-                const { team } = await this.teamServices.find({ space: space.id }, { limit: 5, page: 1 })
+                const { team } = await this.teamServices.find({ space: space.id }, {})
 
                 const { projects } = await this.projectServices._find(space.id)
 
@@ -125,12 +125,15 @@ export default class SpaceController extends Controller {
 
             const id = req.user?.id!;
 
-            const { team, ...space } = await this.spaceServices.create(id, req.body)
+            const space = await this.spaceServices.create(id, req.body)
+
+            const { team } = await this.teamServices.find({ space: space.id }, {})
+
             super.setResponseSuccess({
                 res,
                 status: 201,
                 message: "Space are created",
-                data: { space }
+                data: { space, team }
             })
 
         } catch (error) {

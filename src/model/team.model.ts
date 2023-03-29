@@ -23,8 +23,10 @@ export class TeamRepository extends BaseRepository<ITeam>{
     }
 
     async find(item: Partial<ITeam>, option: any): Promise<any> {
+        console.log("lll", option)
 
-        const { limit = 5, page = 1 } = option
+        const { limit = null, page = 1 } = option
+
         try {
             const query = this.db(this.tableName)
                 .leftJoin("users as user", "user.id", "=", "teams.userId")
@@ -37,7 +39,17 @@ export class TeamRepository extends BaseRepository<ITeam>{
                 )
                 .where("teams.space", "=", item.space!)
 
-            const team = await query.clone().limit(limit).offset((page - 1) * limit);
+
+            const clonedQuery = query.clone()
+
+
+            if (limit) {
+                console.log("kkk")
+                clonedQuery.limit(limit)
+                    .offset((page! - 1) * limit)
+            }
+
+            const team = await clonedQuery
 
             const count = await query.clone().count('teams.id as CNT').first();
 

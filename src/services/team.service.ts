@@ -34,7 +34,7 @@ export default class TeamServices {
         return this.teamRepo.qb()
     }
 
-    async find(data: Partial<ITeam>, querySearch?: { limit: number, page: number }) {
+    async find(data: Partial<ITeam>, querySearch: { limit?: number, page?: number }) {
         try {
             return await this.teamRepo.find(data, querySearch)
         } catch (error) {
