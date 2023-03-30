@@ -7,6 +7,8 @@ import TokenHelper from './jwt.services';
 import RefreshTokenServices from "./refreshTokenList.services";
 import NodeMailerServices from "./nodemailer.services";
 import TeamServices from "./team.service";
+import JwtServices from './jwt.services';
+
 
 @Service()
 export default class AuthServices {
@@ -15,25 +17,28 @@ export default class AuthServices {
     private readonly tokenHelper: TokenHelper;
     private readonly nodemailerServices: NodeMailerServices;
     private readonly teamServices: TeamServices;
+    private readonly jwtServices: JwtServices;
 
     constructor(
         @Inject() userService: UserServices,
         @Inject() refreshTokenServices: RefreshTokenServices,
         @Inject() tokenHelper: TokenHelper,
         @Inject() nodemailerServices: NodeMailerServices,
-        @Inject() teamServices: TeamServices
+        @Inject() teamServices: TeamServices,
+        @Inject() jwtServices: JwtServices,
     ) {
         this.userService = userService;
         this.refreshTokenServices = refreshTokenServices;
         this.tokenHelper = tokenHelper;
         this.nodemailerServices = nodemailerServices;
         this.teamServices = teamServices
+        this.jwtServices = jwtServices;
     }
 
-    async signup(data: IUser, token?: string) {
+    async signup(data: IUser) {
         try {
 
-            console.log(token)
+            console.log(data)
             let isExist = await this.userService.isExist({ username: data.username });
 
             if (isExist) throw setError(409, "username already exists")
@@ -56,17 +61,6 @@ export default class AuthServices {
                 token: refreshToken
             })
 
-            if (token) {
-                const member = await this.teamServices.acceptInvitation(token, user.id);
-
-                return {
-                    user,
-                    member,
-                    accessToken,
-                    refreshToken
-                }
-            }
-
             const { password, ...others } = user
             return {
                 user: others,
@@ -79,6 +73,28 @@ export default class AuthServices {
         }
     }
 
+    async inviteSignup(data: IUser, token: string) {
+        try {
+
+            const decoded = this.jwtServices.verifyToken(token, 400);
+
+            const email = decoded.email;
+
+            if (!email) throw setError(400, "email is required")
+
+            const signup = await this.signup({
+                ...data,
+                email
+            })
+
+            await this.teamServices.acceptInvitation(token, signup.user.id);
+
+            return signup;
+
+        } catch (error) {
+            throw error
+        }
+    }
     async login(data: IUser) {
         try {
             const user = await this.userService.findOne({

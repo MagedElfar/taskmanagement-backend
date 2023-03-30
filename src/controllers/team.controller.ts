@@ -3,20 +3,29 @@ import { Request, Response, NextFunction } from "express";
 import routes from "../route/_team.routes";
 import { Inject } from "typedi";
 import TeamServices from "../services/team.service";
+import SpaceServices from "../services/space.services";
+import ProjectServices from "../services/project.services";
 
 
 export default class TeamController extends Controller {
     protected routes: APIRoute[];
     private readonly teamServices: TeamServices
+    private readonly spaceService: SpaceServices;
+    private readonly projectService: ProjectServices
 
 
     constructor(
         path: string,
-        @Inject() teamServices: TeamServices
+        @Inject() teamServices: TeamServices,
+        @Inject() spaceService: SpaceServices,
+        @Inject() projectService: ProjectServices
+
     ) {
         super(path);
         this.routes = routes(this);
-        this.teamServices = teamServices
+        this.teamServices = teamServices;
+        this.spaceService = spaceService;
+        this.projectService = projectService
     }
 
     async getTeamHandler(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -66,14 +75,26 @@ export default class TeamController extends Controller {
     async addToTeamHandler(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
 
+            const userId = req.user?.id
             const { token } = req.query
 
-            const member = await this.teamServices.acceptInvitation(token?.toString()!)
+            const member = await this.teamServices.acceptInvitation(token?.toString()!, userId!)
+
+            const space = await this.spaceService.findOne(member.space);
+
+            const { team } = await this.teamServices.find({ space: member.space }, {})
+
+            const { projects } = await this.projectService._find(space.id)
 
             super.setResponseSuccess({
                 res,
                 status: 201,
-                data: { member }
+                data: {
+                    member,
+                    space,
+                    team,
+                    projects
+                }
             })
 
         } catch (error) {

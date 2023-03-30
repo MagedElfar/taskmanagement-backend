@@ -4,9 +4,10 @@ import {
     signupSchema,
     loginSchema,
     sendForgetPasswordLinkSchema,
-    forgetPasswordRestSchema
+    forgetPasswordRestSchema,
+    inviteSignupSchema
 } from '../utils/_aut-validation-schema';
-import validation from "../middleware/validation.middleware"
+import validation, { signupValidation } from "../middleware/validation.middleware"
 
 const routes: (controller: Controller) => APIRoute[] = (controller: any) => {
 
@@ -23,7 +24,7 @@ const routes: (controller: Controller) => APIRoute[] = (controller: any) => {
             path: "/signup",
             method: Methods.POST,
             handler: controller.signupHandler,
-            localMiddleware: [validation(signupSchema)],
+            localMiddleware: [signupValidation(signupSchema, inviteSignupSchema)],
             auth: false
         },
 

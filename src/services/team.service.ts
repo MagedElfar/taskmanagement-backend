@@ -67,9 +67,11 @@ export default class TeamServices {
         try {
             const space = await this.spaceService.findOne(spaceId);
 
-            if (!space) throw setError(404, "workspace not exists")
+            if (!space) throw setError(404, "workspace not exists");
 
-            const member = space.team.find((item: any) => item.user.userEmail === email);
+            const { team } = await this.teamRepo.find({ space: spaceId }, {})
+
+            const member = team.find((item: any) => item.userEmail === email);
 
             if (member) throw setError(400, "this user is already member here")
 
@@ -80,9 +82,9 @@ export default class TeamServices {
 
             if (user) {
                 token = this.jwtServices.newTokenSign({ userId: user.id, spaceId }, "7d");
-                redirectUrl = "team"
+                redirectUrl = "loading"
             } else {
-                token = this.jwtServices.newTokenSign({ spaceId }, "7d")
+                token = this.jwtServices.newTokenSign({ email, spaceId }, "7d")
                 redirectUrl = "signup"
             }
 
@@ -100,13 +102,15 @@ export default class TeamServices {
 
     }
 
-    async acceptInvitation(token: string, user?: number) {
+    async acceptInvitation(token: string, user: number) {
         try {
 
 
             const data = this.jwtServices.verifyToken(token, 400);
 
-            const userId = user || data.userId
+            if (user !== data.userId) throw setError(403, "Forbidden")
+
+            const userId = data.userId
 
             const member = await this.teamRepo.findOne({
                 userId,

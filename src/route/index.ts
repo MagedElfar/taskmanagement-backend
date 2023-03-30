@@ -43,7 +43,9 @@ const routes: Controller[] = [
 
     new TeamController(
         "/teams",
-        Container.get(TeamServices)
+        Container.get(TeamServices),
+        Container.get(SpaceServices),
+        Container.get(ProjectServices)
     ),
 
     new TaskController(

@@ -41,7 +41,13 @@ export default class AuthController extends Controller {
             const { token } = req.query
 
 
-            const user = await this.authServices.signup(req.body, token?.toString())
+            let user;
+
+            if (token) {
+                user = await this.authServices.inviteSignup(req.body, token?.toString())
+            } else {
+                user = await this.authServices.signup(req.body)
+            }
 
             res.cookie("refresh_token", user.refreshToken, config.cookie.option)
 

@@ -89,6 +89,8 @@ export default class SpaceController extends Controller {
                 page: 1,
             });
 
+            console.log(spaces)
+
             if (spaces.length === 0) {
                 super.setResponseSuccess({
                     res, status: 200, data: {
