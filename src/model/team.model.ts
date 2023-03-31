@@ -31,11 +31,14 @@ export class TeamRepository extends BaseRepository<ITeam>{
             const query = this.db(this.tableName)
                 .leftJoin("users as user", "user.id", "=", "teams.userId")
                 .leftJoin("profiles_images as userImg", "userImg.userId", "=", "user.id")
+                .leftJoin("profiles as profile", "profile.userId", "=", "user.id")
                 .select(
                     "teams.*",
                     "userImg.image_url as userImage",
                     "user.username",
-                    "user.email as userEmail"
+                    "user.email as userEmail",
+                    "profile.first_name as firstName",
+                    "profile.last_name as lastName"
                 )
                 .where("teams.space", "=", item.space!)
 

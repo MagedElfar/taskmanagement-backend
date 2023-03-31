@@ -17,8 +17,8 @@ const updateUserSchema = Joi.object({
             "string.email": "invalid email format"
         }),
 
-    first_name: Joi.string().optional(),
-    last_name: Joi.string().optional(),
+    first_name: Joi.string().allow("").optional(),
+    last_name: Joi.string().allow("").optional(),
     phone: Joi.string().optional(),
     gender: Joi.string().optional().valid(...Object.values(Gender))
 })
