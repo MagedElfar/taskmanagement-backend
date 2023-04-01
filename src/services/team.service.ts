@@ -27,7 +27,7 @@ export default class TeamServices {
         this.userService = userService;
         this.nodeMailerServices = nodeMailerServices
         this.spaceService = spaceService;
-
+ 
     }
 
     teamQueryServices() {

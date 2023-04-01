@@ -18,10 +18,7 @@ export default class ProjectServices {
 
     async _find(spaceId: number) {
         try {
-            return await this.projectRepo.find({ spaceId }, {
-                limit: 3,
-                page: 1
-            })
+            return await this.projectRepo.find({ spaceId }, {})
         } catch (error) {
             throw error
         }

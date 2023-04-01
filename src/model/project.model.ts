@@ -21,8 +21,8 @@ export class ProjectRepository extends BaseRepository<IProject>{
 
 
         const {
-            limit,
-            page,
+            limit = null,
+            page = 1,
             term,
         } = option
         try {

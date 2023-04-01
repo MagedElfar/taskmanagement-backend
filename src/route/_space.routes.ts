@@ -1,6 +1,6 @@
 import Controller, { APIRoute, Methods } from '../app/controller';
 import validation from "../middleware/validation.middleware"
-import { spaceSchema } from '../utils/_space-validation-schema';
+import { getSpacesSchema, spaceSchema } from '../utils/_space-validation-schema';
 import PermissionsFactory from "../middleware/permissions.middleware"
 import { paramSchema } from '../utils/_commen-validation-schema';
 
@@ -14,7 +14,7 @@ const routes: (controller: Controller) => APIRoute[] = (controller: any) => {
             path: "/",
             method: Methods.GET,
             handler: controller.getSpacesHandler,
-            localMiddleware: [],
+            localMiddleware: [validation(getSpacesSchema, "query")],
             auth: true
         },
 

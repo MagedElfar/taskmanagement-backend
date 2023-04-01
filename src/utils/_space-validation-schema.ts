@@ -5,7 +5,16 @@ const spaceSchema = Joi.object({
         .required(),
 })
 
+const getSpacesSchema = Joi.object({
+    term: Joi.string().allow("").optional(),
+    page: Joi.number()
+        .when('limit', { is: Joi.exist(), then: Joi.required(), otherwise: Joi.optional() }),
+    limit: Joi.number().optional(),
+});
+
+
 
 export {
-    spaceSchema
+    spaceSchema,
+    getSpacesSchema
 }
