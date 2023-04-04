@@ -55,7 +55,15 @@ export class TakRepository extends BaseRepository<ITask>{
 
             query.leftJoin("assignees", "assignees.taskId", "=", "tasks.id")
                 .leftJoin("teams as member", "member.id", "=", "assignees.memberId")
-                .select("tasks.*")
+                .leftJoin("users as assignTo", "assignTo.id", "=", "member.userId")
+                .leftJoin("profiles_images as assignToImage", "assignToImage.userId", "=", "assignTo.id")
+                .select(
+                    "tasks.*",
+                    "assignees.id as assignId",
+                    "assignTo.username as assignToUserName",
+                    "assignToImage.image_url as assignToImage_url",
+                    "project.name as projectName"
+                )
 
             if (user) {
                 query.where("member.userId", "=", userId!)
@@ -111,7 +119,7 @@ export class TakRepository extends BaseRepository<ITask>{
                     "user.username",
                     "userImage.image_url as user_url",
                     "assign.id as assignId",
-                    "assignTo.username as assignToImageName",
+                    "assignTo.username as assignToUserName",
                     "assignToImage.image_url as assignToImage_url",
                     "project.name as projectName"
                 )

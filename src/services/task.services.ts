@@ -85,6 +85,16 @@ export default class TaskServices {
                 user1_Id: userId
             })
 
+            if (data?.memberId) {
+                const assign = await this.assign(userId, {
+                    taskId: task.id,
+                    memberId: data.memberId
+                })
+
+                task.assignTo = assign.username;
+                task.assignToImage = assign.url
+            }
+
             return task;
         } catch (error) {
             throw error;

@@ -34,6 +34,7 @@ const taskAttachmentSchema = Joi.object({
 
 const getTaskSSchema = Joi.object({
     spaceId: Joi.number().optional(),
+    memberId: Joi.number().optional(),
     project: Joi.number(),
     term: Joi.string().optional(),
     page: Joi.number()
