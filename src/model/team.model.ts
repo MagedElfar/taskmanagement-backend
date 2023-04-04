@@ -38,6 +38,7 @@ export class TeamRepository extends BaseRepository<ITeam>{
                     "user.username",
                     "user.email as userEmail",
                     "profile.first_name as firstName",
+                    "profile.phone",
                     "profile.last_name as lastName"
                 )
                 .where("teams.space", "=", item.space!)
@@ -73,7 +74,7 @@ export class TeamRepository extends BaseRepository<ITeam>{
                 .select("teams.*", "spaces.owner as spaceOwner")
             return typeof id === 'number'
                 ? await query.where('teams.id', id).first()
-                : Object.keys(id).includes("id") ? query.where({ "teams.id": id.id }) : query.where(id).first()
+                : await Object.keys(id).includes("id") ? query.where({ "teams.id": id.id }) : query.where(id).first()
         } catch (error) {
             console.log(error)
             throw setError(500, "database failure")

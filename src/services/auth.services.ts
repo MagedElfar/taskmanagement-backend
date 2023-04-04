@@ -38,7 +38,6 @@ export default class AuthServices {
     async signup(data: IUser) {
         try {
 
-            console.log(data)
             let isExist = await this.userService.isExist({ username: data.username });
 
             if (isExist) throw setError(409, "username already exists")
@@ -74,6 +73,7 @@ export default class AuthServices {
     }
 
     async inviteSignup(data: IUser, token: string) {
+        let id = 0;
         try {
 
             const decoded = this.jwtServices.verifyToken(token, 400);
@@ -87,11 +87,13 @@ export default class AuthServices {
                 email
             })
 
-            await this.teamServices.acceptInvitation(token, signup.user.id);
+            id = signup.user.id
+            await this.teamServices.acceptNewUserInvitation(token, signup.user.id);
 
             return signup;
 
         } catch (error) {
+            if (id > 0) await this.userService.delete(id)
             throw error
         }
     }

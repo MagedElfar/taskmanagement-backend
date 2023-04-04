@@ -27,7 +27,7 @@ export default class TeamServices {
         this.userService = userService;
         this.nodeMailerServices = nodeMailerServices
         this.spaceService = spaceService;
- 
+
     }
 
     teamQueryServices() {
@@ -102,11 +102,32 @@ export default class TeamServices {
 
     }
 
+    async acceptNewUserInvitation(token: string, userId: number) {
+        try {
+            const data = this.jwtServices.verifyToken(token, 400);
+
+            const member = await this.teamRepo.findOne({
+                userId,
+                space: data.spaceId
+            })
+
+            if (member) throw setError(400, "you already jointed")
+
+            return await this.create(userId, {
+                space: data.spaceId,
+                role: Role.MEMBER
+            })
+        } catch (error) {
+            throw error
+        }
+    }
+
     async acceptInvitation(token: string, user: number) {
         try {
 
 
             const data = this.jwtServices.verifyToken(token, 400);
+
 
             if (user !== data.userId) throw setError(403, "Forbidden")
 
@@ -117,10 +138,8 @@ export default class TeamServices {
                 space: data.spaceId
             })
 
-            console.log("member", member)
 
             if (member) throw setError(400, "you already jointed")
-            console.log(member)
 
             return await this.create(userId, {
                 space: data.spaceId,

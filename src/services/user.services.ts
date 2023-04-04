@@ -73,6 +73,14 @@ export default class UserServices {
         }
     }
 
+    async delete(id: number) {
+        try {
+            await this.userRepo.delete(id)
+        } catch (error) {
+            throw error
+        }
+    }
+
     async changePassword(userId: number, data: {
         password: string,
         new_password: string
