@@ -38,7 +38,32 @@ export class TakRepository extends BaseRepository<ITask>{
         super("tasks")
     }
 
+    async ordersUpdate(query: string) {
+        try {
+            await this.db.raw(query)
+        } catch (error) {
+            console.log(error)
+            throw setError(500, "database failure")
+        }
+    }
 
+    async create(item: Omit<ITask, 'id'>): Promise<ITask> {
+        try {
+            const pos = await this.db.raw("SELECT IFNULL((SELECT position FROM tasks ORDER BY position DESC LIMIT 1) ,0) as position;");
+
+            const position = pos[0][0].position + 1;
+
+            const [output] = await this.qb().insert({
+                ...item,
+                position
+            })
+            const data = await this.findOne(output)
+            return data
+        } catch (error) {
+            console.log(error)
+            throw setError(500, "database failure")
+        }
+    }
 
     async find(getTaskDto: GetTasksDto): Promise<any> {
 
@@ -57,6 +82,7 @@ export class TakRepository extends BaseRepository<ITask>{
                 .leftJoin("teams as member", "member.id", "=", "assignees.memberId")
                 .leftJoin("users as assignTo", "assignTo.id", "=", "member.userId")
                 .leftJoin("profiles_images as assignToImage", "assignToImage.userId", "=", "assignTo.id")
+                .leftJoin("projects as project", "project.id", "=", "tasks.projectId")
                 .select(
                     "tasks.*",
                     "assignees.id as assignId",

@@ -16,13 +16,19 @@ const taskSchema = Joi.object({
     spaceId: Joi.number().required(),
     parentId: Joi.number().allow(null).optional(),
     projectId: Joi.number().allow(null).optional(),
+    memberId: Joi.number().allow(null).optional(),
+
 })
 
 const updateTaskStatus = Joi.object({
     status: Joi.string().optional().valid(...Object.values(TaskStatus)),
 })
 
+const updateTaskOrder = Joi.object({
+    status: Joi.string().optional().valid(...Object.values(TaskStatus)),
+    position: Joi.number().optional(),
 
+})
 const assignTaskSchema = Joi.object({
     taskId: Joi.number().required(),
     memberId: Joi.number().required()
@@ -34,14 +40,13 @@ const taskAttachmentSchema = Joi.object({
 
 const getTaskSSchema = Joi.object({
     spaceId: Joi.number().optional(),
-    memberId: Joi.number().optional(),
     project: Joi.number(),
     term: Joi.string().optional(),
     page: Joi.number()
         .when('limit', { is: Joi.exist(), then: Joi.required(), otherwise: Joi.optional() }),
     limit: Joi.number().optional(),
     user: Joi.boolean().optional().valid(true),
-    orderBy: Joi.string().optional().valid("created_at", "due_date"),
+    orderBy: Joi.string().optional().valid("created_at", "due_date", "position"),
     order: Joi.string().optional().valid("desc", "asc"),
     status: Joi.string().optional().valid(...Object.values(TaskStatus)),
 }).or('spaceId', 'user');
@@ -51,5 +56,6 @@ export {
     assignTaskSchema,
     getTaskSSchema,
     taskAttachmentSchema,
-    updateTaskStatus
+    updateTaskStatus,
+    updateTaskOrder
 }

@@ -65,6 +65,8 @@ export default class TaskServices {
     async create(userId: number, data: Partial<ITask>) {
         try {
 
+            const { memberId = null, ...taskData } = data
+
             if (data.projectId) {
                 const project = await this.projectServices.findOne({
                     id: data.projectId,
@@ -75,7 +77,7 @@ export default class TaskServices {
             }
 
             const task = await this.taskRepo.create({
-                ...data,
+                ...taskData,
                 userId
             })
 
@@ -91,8 +93,9 @@ export default class TaskServices {
                     memberId: data.memberId
                 })
 
-                task.assignTo = assign.username;
-                task.assignToImage = assign.url
+                task.assignId = assign.id;
+                task.assignToUserName = assign.username;
+                task.assignToImage_url = assign.url
             }
 
             return task;
@@ -165,6 +168,43 @@ export default class TaskServices {
                 activity: `update task status to ${status}`,
                 user1_Id: userId
             })
+
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async updateTaskStatusWithOrder(userId: number, taskId: number, status: TaskStatus, position: number) {
+        try {
+            const task = await this.QueryServices().where({ id: taskId }).first();
+
+            if (!task) throw setError(404, "task not found");
+
+            const currentStatus = task.status;
+
+            if (currentStatus !== status) await this.updateStatus(userId, taskId, status)
+
+            const currentPosition = task["position"];
+
+            if (currentPosition === position) return
+
+            const direction = position > currentPosition ? "down" : "up";
+
+            await this.QueryServices()
+                .where("tasks.id", "=", taskId)
+                .andWhere("tasks.position", "=", position)
+                .update({ position: 0 })
+
+            if (direction === "up") {
+                await this.taskRepo.ordersUpdate(`UPDATE tasks SET position = ( position + 1 )  WHERE  position >= ${position} AND position < ${currentPosition}`)
+            } else {
+                await this.taskRepo.ordersUpdate(`UPDATE tasks SET position = ( position - 1 )  WHERE  position > ${currentPosition} AND position <= ${position} `)
+            }
+
+            await this.QueryServices()
+                .where("tasks.id", "=", taskId)
+                // .andWhere("tasks.position", "=", 0)
+                .update({ position })
 
         } catch (error) {
             throw error;

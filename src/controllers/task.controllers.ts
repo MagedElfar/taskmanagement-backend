@@ -156,6 +156,25 @@ export default class TaskController extends Controller {
         }
     };
 
+    async updateTaskOrderHandler(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+
+            const userId = req.user?.id!;
+
+            const { id } = req.params;
+
+            await this.taskServices.updateTaskStatusWithOrder(userId, +id!, req.body.status, req.body.position)
+
+            super.setResponseSuccess({
+                res,
+                status: 200,
+            })
+
+        } catch (error) {
+            next(error)
+        }
+    };
+
     async markTaskCompleteHandler(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
 
