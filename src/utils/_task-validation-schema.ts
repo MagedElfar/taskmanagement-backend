@@ -20,6 +20,18 @@ const taskSchema = Joi.object({
 
 })
 
+const updateTaskSchema = Joi.object({
+    title: Joi.string().optional(),
+    description: Joi.string().optional(),
+    priority: Joi.string().optional().valid(...Object.values(TaskPRIORITY)),
+    due_date: Joi.date().format('YYYY-MM-DD').optional().greater(date),
+    spaceId: Joi.number().required(),
+    parentId: Joi.number().allow(null).optional(),
+    projectId: Joi.number().allow(null).optional(),
+    memberId: Joi.number().allow(null).optional(),
+
+})
+
 const updateTaskStatus = Joi.object({
     status: Joi.string().optional().valid(...Object.values(TaskStatus)),
 })
@@ -57,5 +69,6 @@ export {
     getTaskSSchema,
     taskAttachmentSchema,
     updateTaskStatus,
-    updateTaskOrder
+    updateTaskOrder,
+    updateTaskSchema
 }

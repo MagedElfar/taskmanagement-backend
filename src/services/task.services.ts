@@ -144,11 +144,14 @@ export default class TaskServices {
 
             const task = await this.taskRepo.update(taskId, data);
 
-            await this.activityServices.addActivity({
-                taskId: task.id,
-                activity: "update the task",
-                user1_Id: userId
-            })
+            await Promise.all(Object.keys(data).map(async (key: string) => {
+                await this.activityServices.addActivity({
+                    taskId: task.id,
+                    activity: `chang task ${key} to ${data[key]}`,
+                    user1_Id: userId
+                })
+
+            }))
 
         } catch (error) {
             throw error;

@@ -9,6 +9,7 @@ import {
     taskAttachmentSchema,
     taskSchema,
     updateTaskOrder,
+    updateTaskSchema,
     updateTaskStatus
 } from '../utils/_task-validation-schema';
 
@@ -58,7 +59,7 @@ const routes: (controller: Controller) => APIRoute[] = (controller: any) => {
             handler: controller.updateTaskHandler,
             localMiddleware: [
                 validation(paramSchema, "param"),
-                validation(taskSchema),
+                validation(updateTaskSchema),
                 Permission.memberPermissions
             ],
             auth: true
