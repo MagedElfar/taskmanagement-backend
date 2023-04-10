@@ -86,6 +86,7 @@ export class TakRepository extends BaseRepository<ITask>{
                 .select(
                     "tasks.*",
                     "assignees.id as assignId",
+                    "assignees.memberId as assignIdMember",
                     "assignTo.username as assignToUserName",
                     "assignToImage.image_url as assignToImage_url",
                     "project.name as projectName"
@@ -145,6 +146,8 @@ export class TakRepository extends BaseRepository<ITask>{
                     "user.username",
                     "userImage.image_url as user_url",
                     "assign.id as assignId",
+                    "assign.memberId as assignIdMember",
+
                     "assignTo.username as assignToUserName",
                     "assignToImage.image_url as assignToImage_url",
                     "project.name as projectName"

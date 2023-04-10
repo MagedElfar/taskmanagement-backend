@@ -153,6 +153,7 @@ export default class TaskServices {
 
             }))
 
+            return task
         } catch (error) {
             throw error;
         }
