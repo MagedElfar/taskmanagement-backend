@@ -24,7 +24,7 @@ const updateTaskSchema = Joi.object({
     title: Joi.string().optional(),
     description: Joi.string().optional(),
     priority: Joi.string().optional().valid(...Object.values(TaskPRIORITY)),
-    due_date: Joi.date().format('YYYY-MM-DD').optional().greater(date),
+    due_date: Joi.date().format('YYYY-MM-DD').allow(null).optional().greater(date),
     spaceId: Joi.number().required(),
     parentId: Joi.number().allow(null).optional(),
     projectId: Joi.number().allow(null).optional(),
