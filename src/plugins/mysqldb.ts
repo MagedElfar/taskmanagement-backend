@@ -107,14 +107,14 @@ export default abstract class KnexRepository<T> implements BaseRepository<T> {
 
 
     async find(item: Partial<T>, option?: any): Promise<any> {
-        // try {
-        //     return this.qb()
-        //         .where(item)
-        //         .select()
-        // } catch (error) {
-        //     console.log(error)
-        //     throw setError(500, "database failure")
-        // }
+        try {
+            return this.qb()
+                .where(item)
+                .select()
+        } catch (error) {
+            console.log(error)
+            throw setError(500, "database failure")
+        }
     }
 
     async findOne(id: number | Partial<T>): Promise<T> {

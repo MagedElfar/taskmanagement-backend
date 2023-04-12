@@ -16,7 +16,16 @@ export class TaskAttachmentRepository extends BaseRepository<ITaskAttachment>{
     constructor() {
         super("task_attachments")
     }
-
+    async find(item: Partial<ITaskAttachment>, option?: any): Promise<ITaskAttachment[]> {
+        try {
+            return this.qb()
+                .where(item)
+                .select("task_attachments.id", "task_attachments.url")
+        } catch (error) {
+            console.log(error)
+            throw setError(500, "database failure")
+        }
+    }
     async findOne(id: number | Partial<ITaskAttachment>): Promise<ITaskAttachment> {
         try {
             const query = this.qb()

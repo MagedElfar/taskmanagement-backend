@@ -79,6 +79,7 @@ export class TakRepository extends BaseRepository<ITask>{
             }
 
             query.leftJoin("assignees", "assignees.taskId", "=", "tasks.id")
+                .leftJoin("task_attachments", "task_attachments.taskId", "=", "tasks.id")
                 .leftJoin("teams as member", "member.id", "=", "assignees.memberId")
                 .leftJoin("users as assignTo", "assignTo.id", "=", "member.userId")
                 .leftJoin("profiles_images as assignToImage", "assignToImage.userId", "=", "assignTo.id")
@@ -89,7 +90,8 @@ export class TakRepository extends BaseRepository<ITask>{
                     "assignees.memberId as assignIdMember",
                     "assignTo.username as assignToUserName",
                     "assignToImage.image_url as assignToImage_url",
-                    "project.name as projectName"
+                    "project.name as projectName",
+                    "task_attachments.url as taskMedia"
                 )
 
             if (user) {
@@ -106,6 +108,9 @@ export class TakRepository extends BaseRepository<ITask>{
                 query.andWhere(`tasks.${key}`, "=", others[key])
 
             })
+
+            query.groupBy("tasks.id")
+
 
             const tasksQuery = query.clone()
 

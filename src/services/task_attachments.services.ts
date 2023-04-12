@@ -20,6 +20,13 @@ export default class TaskAttachmentServices {
         return this.taskAttachmentRepo.qb()
     }
 
+    async find(taskId: number) {
+        try {
+            return await this.taskAttachmentRepo.find({ taskId })
+        } catch (error) {
+            throw error
+        }
+    }
     async addAttachment(userId: number, taskId: number, files: any) {
         try {
 

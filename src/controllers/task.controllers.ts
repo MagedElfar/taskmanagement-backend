@@ -41,6 +41,9 @@ export default class TaskController extends Controller {
                 userId
             });
 
+            console.log(tasks)
+
+
             super.setResponseSuccess({
                 res,
                 status: 200,
@@ -89,6 +92,7 @@ export default class TaskController extends Controller {
 
             const subTasks = await this.taskServices.find({ parentId: +id! });
 
+            const attachments = await this.taskAttachmentServices.find(task.id)
 
             const comments = await this.commentServices.find({
                 limit: 5,
@@ -101,11 +105,13 @@ export default class TaskController extends Controller {
                 page: 1
             })
 
+
             super.setResponseSuccess({
                 res,
                 status: 200,
                 data: {
                     task,
+                    attachments,
                     subTasks,
                     comments,
                     activities
