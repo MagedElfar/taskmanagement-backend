@@ -50,7 +50,6 @@ export default class TaskAttachmentServices {
             return media;
         } catch (error) {
             files.map((file: Express.Multer.File) => {
-                console.log(file)
                 fs.unlink(file.path, function (err) {
                     if (err) console.log(err)
                 })

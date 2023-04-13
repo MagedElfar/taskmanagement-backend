@@ -135,8 +135,6 @@ export default class TaskServices {
                     spaceId: data.spaceId
                 });
 
-                console.log(project)
-
 
                 if (!project) throw setError(404, "project not found")
             }
@@ -144,10 +142,12 @@ export default class TaskServices {
 
             const task = await this.taskRepo.update(taskId, data);
 
-            await Promise.all(Object.keys(data).map(async (key: string) => {
+            const { spaceId, projectId, ...others } = data;
+
+            await Promise.all(Object.keys(others).map(async (key: string) => {
                 await this.activityServices.addActivity({
                     taskId: task.id,
-                    activity: `chang task ${key} to ${data[key]}`,
+                    activity: `change task ${key} to ${data[key]}`,
                     user1_Id: userId
                 })
 

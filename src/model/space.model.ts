@@ -25,8 +25,6 @@ export class SpaceRepository extends BaseRepository<ISpace>{
                 .leftJoin("teams as team", "team.space", "=", "spaces.id")
                 .where("team.userId", "=", userId)
 
-            console.log(term)
-
             if (term) query.where("spaces.name", "like", `%${term}%`)
 
 

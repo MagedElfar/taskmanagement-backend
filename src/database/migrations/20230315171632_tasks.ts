@@ -17,6 +17,7 @@ export const up = function (knex: Knex) {
             table.integer("userId").unsigned().notNullable();
             table.integer("parentId").unsigned().nullable();
             table.integer("projectId").unsigned().nullable();
+            table.integer("position").unsigned().nullable();
 
 
             table.foreign("spaceId")

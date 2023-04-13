@@ -41,9 +41,6 @@ export default class TaskController extends Controller {
                 userId
             });
 
-            console.log(tasks)
-
-
             super.setResponseSuccess({
                 res,
                 status: 200,
@@ -101,7 +98,7 @@ export default class TaskController extends Controller {
             })
 
             const activities = await this.activityServices._find(+id, {
-                limit: 3,
+                limit: 5,
                 page: 1
             })
 

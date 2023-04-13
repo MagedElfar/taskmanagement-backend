@@ -23,7 +23,6 @@ export class TeamRepository extends BaseRepository<ITeam>{
     }
 
     async find(item: Partial<ITeam>, option: any): Promise<any> {
-        console.log("lll", option)
 
         const { limit = null, page = 1 } = option
 
@@ -48,7 +47,6 @@ export class TeamRepository extends BaseRepository<ITeam>{
 
 
             if (limit) {
-                console.log("kkk")
                 clonedQuery.limit(limit)
                     .offset((page! - 1) * limit)
             }

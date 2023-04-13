@@ -72,8 +72,6 @@ export class TakRepository extends BaseRepository<ITask>{
 
             const { user, userId, parentId, page, limit, order = "desc", orderBy = "created_at", ...others } = getTaskDto
 
-            console.log(getTaskDto)
-
             if (parentId) {
                 return await query.where({ parentId }).select("*")
             }
@@ -167,7 +165,6 @@ export class TakRepository extends BaseRepository<ITask>{
 
                     delete id[key]
                 })
-                console.log(id)
                 query.where(id)
             }
 
