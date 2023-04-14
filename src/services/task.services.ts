@@ -145,6 +145,13 @@ export default class TaskServices {
             const { spaceId, projectId, ...others } = data;
 
             await Promise.all(Object.keys(others).map(async (key: string) => {
+                if (key === "due_date" && data[key] === null) {
+                    return await this.activityServices.addActivity({
+                        taskId: task.id,
+                        activity: `change task ${key} to no due date`,
+                        user1_Id: userId
+                    })
+                }
                 await this.activityServices.addActivity({
                     taskId: task.id,
                     activity: `change task ${key} to ${data[key]}`,

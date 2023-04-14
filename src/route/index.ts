@@ -52,7 +52,6 @@ const routes: Controller[] = [
         "/tasks",
         Container.get(TaskServices),
         Container.get(TaskAttachmentServices),
-        Container.get(CommentServices),
         Container.get(ActivityServices)
     ),
 

@@ -1,5 +1,6 @@
 import { Inject, Service } from "typedi";
 import { ActivityRepository, IActivity } from '../model/activity.model';
+import { setError } from "../utils/error-format";
 
 @Service()
 export default class ActivityServices {
@@ -37,4 +38,50 @@ export default class ActivityServices {
             throw error;
         }
     }
+
+    async addComment(userId: number, data: Partial<IActivity>) {
+        try {
+
+
+            return this.addActivity({
+                user1_Id: userId,
+                type: "comment",
+                ...data
+            })
+
+
+        } catch (error) {
+
+            throw error;
+        }
+    }
+
+    async deleteComment(userId: number, activityId: number) {
+        try {
+            const comment = await this.activityRepository.findOne(activityId);
+
+            if (!comment || comment.user1_Id !== userId) throw setError(403, "Forbidden")
+
+
+            await this.activityRepository.delete(activityId)
+
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async editComment(userId: number, activityId: number, data: Partial<IActivity>) {
+        try {
+            const comment = await this.activityRepository.findOne(activityId);
+
+            if (!comment || comment.user1_Id !== userId) throw setError(403, "Forbidden")
+
+
+            await this.activityRepository.update(activityId, data)
+
+        } catch (error) {
+            throw error;
+        }
+    }
+
 } 

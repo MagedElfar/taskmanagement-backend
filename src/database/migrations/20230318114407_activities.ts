@@ -8,6 +8,7 @@ export const up = function (knex: Knex) {
             table.integer("taskId").unsigned().notNullable();
             table.integer("user1_Id").unsigned().nullable();
             table.integer("user2_Id").unsigned().nullable();
+            table.enu("type", ["activity", "comment"]).defaultTo("activity")
 
 
             table.foreign("taskId")

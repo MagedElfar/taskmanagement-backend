@@ -4,7 +4,6 @@ import routes from "../route/_task.routes";
 import { Inject } from "typedi";
 import TaskServices from "../services/task.services";
 import TaskAttachmentServices from "../services/task_attachments.services";
-import CommentServices from "../services/comment.services";
 import ActivityServices from "../services/activity.services";
 
 
@@ -12,14 +11,12 @@ export default class TaskController extends Controller {
     protected routes: APIRoute[];
     private readonly taskServices: TaskServices;
     private readonly taskAttachmentServices: TaskAttachmentServices;
-    private readonly commentServices: CommentServices;
     private readonly activityServices: ActivityServices
 
     constructor(
         path: string,
         @Inject() taskServices: TaskServices,
         @Inject() taskAttachmentServices: TaskAttachmentServices,
-        @Inject() commentServices: CommentServices,
         @Inject() activityServices: ActivityServices
 
     ) {
@@ -27,7 +24,6 @@ export default class TaskController extends Controller {
         this.routes = routes(this);
         this.taskServices = taskServices;
         this.taskAttachmentServices = taskAttachmentServices;
-        this.commentServices = commentServices;
         this.activityServices = activityServices
     }
 
@@ -91,12 +87,6 @@ export default class TaskController extends Controller {
 
             const attachments = await this.taskAttachmentServices.find(task.id)
 
-            const comments = await this.commentServices.find({
-                limit: 5,
-                page: 1,
-                taskId: +id!
-            })
-
             const activities = await this.activityServices._find(+id, {
                 limit: 5,
                 page: 1
@@ -110,7 +100,6 @@ export default class TaskController extends Controller {
                     task,
                     attachments,
                     subTasks,
-                    comments,
                     activities
                 }
             })

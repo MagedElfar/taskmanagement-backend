@@ -42,4 +42,61 @@ export default class ActivityController extends Controller {
             next(error)
         }
     };
+
+    async addCommentHandler(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+
+            const user = req.user;
+
+            const comment = await this.activityServices.addComment(user?.id!, req.body);
+
+            super.setResponseSuccess({
+                res,
+                status: 201,
+                data: { comment }
+            })
+
+        } catch (error) {
+            next(error)
+        }
+    };
+
+    async deleteCommentHandler(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+
+            const user = req.user;
+
+            const { id } = req.params
+
+            await this.activityServices.deleteComment(user?.id!, +id);
+
+            super.setResponseSuccess({
+                res,
+                status: 200
+            })
+
+        } catch (error) {
+            next(error)
+        }
+    };
+
+    async editCommentHandler(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+
+            const user = req.user;
+
+            const { id } = req.params
+
+            await this.activityServices.editComment(user?.id!, +id, req.body);
+
+            super.setResponseSuccess({
+                res,
+                status: 200
+            })
+
+        } catch (error) {
+            next(error)
+        }
+    };
+
 }

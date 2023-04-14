@@ -9,7 +9,7 @@ export interface IActivity extends Model {
     activity: string;
     user1_Id: number;
     user2_Id: number
-
+    type?: string
 }
 
 @Service()
@@ -26,10 +26,19 @@ export class ActivityRepository extends BaseRepository<IActivity>{
             const query = this.db(this.tableName)
                 .leftJoin("users as user1", "user1.id", "=", "activities.user1_Id")
                 .leftJoin("users as user2", "user2.id", "=", "activities.user2_Id")
+                .leftJoin("profiles_images as image", "image.userId", "=", "user1.id")
+                .leftJoin("profiles as profile1", "user1.id", "=", "profile1.userId")
+                .leftJoin("profiles as profile2", "user2.id", "=", "profile2.userId")
                 .select(
                     "activities.*",
                     "user1.username as user1",
-                    "user2.username as user2"
+                    "user2.username as user2",
+                    "profile1.first_name as user1FirstName",
+                    "profile1.last_name as user1LastName",
+                    "profile2.first_name as user2FirstName",
+                    "profile2.last_name as user2LastName",
+                    "image.image_url as userImage"
+
                 )
                 .where(item)
 
@@ -45,6 +54,47 @@ export class ActivityRepository extends BaseRepository<IActivity>{
                 data,
                 count: count?.CNT
             }
+        } catch (error) {
+            console.log(error)
+            throw setError(500, "database failure")
+        }
+    }
+
+    async findOne(id: number | Partial<IActivity>): Promise<IActivity> {
+        try {
+            const query = this.db(this.tableName)
+                .leftJoin("users as user1", "user1.id", "=", "activities.user1_Id")
+                .leftJoin("users as user2", "user2.id", "=", "activities.user2_Id")
+                .leftJoin("profiles_images as image", "image.userId", "=", "user1.id")
+                .leftJoin("profiles as profile1", "user1.id", "=", "profile1.userId")
+                .leftJoin("profiles as profile2", "user2.id", "=", "profile2.userId")
+                .select(
+                    "activities.*",
+                    "user1.username as user1",
+                    "user2.username as user2",
+                    "profile1.first_name as user1FirstName",
+                    "profile1.last_name as user1LastName",
+                    "profile2.first_name as user2FirstName",
+                    "profile2.last_name as user2LastName",
+                    "image.image_url as userImage"
+
+                )
+
+
+            if (typeof id === 'number') {
+                query.where('activities.id', id)
+            } else {
+                Object.keys(id).forEach(key => {
+                    id[`activities.${key}`] = id[key];
+
+                    delete id[key]
+                })
+                query.where(id)
+            }
+
+
+            return await query.first()
+
         } catch (error) {
             console.log(error)
             throw setError(500, "database failure")

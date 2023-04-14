@@ -3,7 +3,12 @@ import Joi from "joi";
 const commentSchema = Joi.object({
     taskId: Joi.number()
         .required(),
-    comment: Joi.string()
+    activity: Joi.string()
+        .required()
+})
+
+const editCommentSchema = Joi.object({
+    activity: Joi.string()
         .required()
 })
 
@@ -17,5 +22,6 @@ const getCommentsSchema = Joi.object({
 
 export {
     commentSchema,
-    getCommentsSchema
+    getCommentsSchema,
+    editCommentSchema
 }
