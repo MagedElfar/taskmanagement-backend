@@ -10,7 +10,7 @@ date.setDate(date.getDate() - 1);
 
 const taskSchema = Joi.object({
     title: Joi.string().required(),
-    description: Joi.string().required(),
+    description: Joi.string().allow("").required(),
     priority: Joi.string().optional().valid(...Object.values(TaskPRIORITY)),
     due_date: Joi.date().format('YYYY-MM-DD').optional().greater(date),
     spaceId: Joi.number().required(),

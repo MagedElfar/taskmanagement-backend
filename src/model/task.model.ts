@@ -51,7 +51,7 @@ export class TakRepository extends BaseRepository<ITask>{
         try {
             const pos = await this.db.raw("SELECT IFNULL((SELECT position FROM tasks ORDER BY position DESC LIMIT 1) ,0) as position;");
 
-            const position = pos[0][0].position + 1;
+            const position = +pos[0][0].position + 1;
 
             const [output] = await this.qb().insert({
                 ...item,
@@ -76,7 +76,9 @@ export class TakRepository extends BaseRepository<ITask>{
                 return await query.where({ parentId }).select("*")
             }
 
-            query.leftJoin("assignees", "assignees.taskId", "=", "tasks.id")
+            query
+                .leftJoin("tasks as parent", "parent.id", "=", "tasks.parentId")
+                .leftJoin("assignees", "assignees.taskId", "=", "tasks.id")
                 .leftJoin("task_attachments", "task_attachments.taskId", "=", "tasks.id")
                 .leftJoin("teams as member", "member.id", "=", "assignees.memberId")
                 .leftJoin("users as assignTo", "assignTo.id", "=", "member.userId")
@@ -85,6 +87,7 @@ export class TakRepository extends BaseRepository<ITask>{
                 .select(
                     "tasks.*",
                     "assignees.id as assignId",
+                    "parent.title as parentTsk",
                     "assignees.memberId as assignIdMember",
                     "assignTo.username as assignToUserName",
                     "assignToImage.image_url as assignToImage_url",
@@ -122,7 +125,7 @@ export class TakRepository extends BaseRepository<ITask>{
 
             const count = await query.clone().count('tasks.id as CNT').first();
 
-
+            console.log(data)
             return {
                 data,
                 count: count?.CNT
@@ -143,6 +146,7 @@ export class TakRepository extends BaseRepository<ITask>{
                 .leftJoin("users as assignTo", "assignTo.id", "=", "member.userId")
                 .leftJoin("profiles_images as assignToImage", "assignToImage.userId", "=", "assignTo.id")
                 .leftJoin("projects as project", "project.id", "=", "tasks.projectId")
+                .leftJoin("tasks as parent", "parent.id", "=", "tasks.parentId")
 
                 .select(
                     "tasks.*",
@@ -150,7 +154,7 @@ export class TakRepository extends BaseRepository<ITask>{
                     "userImage.image_url as user_url",
                     "assign.id as assignId",
                     "assign.memberId as assignIdMember",
-
+                    "parent.title as parentTsk",
                     "assignTo.username as assignToUserName",
                     "assignToImage.image_url as assignToImage_url",
                     "project.name as projectName"
