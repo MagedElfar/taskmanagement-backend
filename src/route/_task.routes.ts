@@ -100,6 +100,16 @@ const routes: (controller: Controller) => APIRoute[] = (controller: any) => {
             ],
             auth: true
         },
+        {
+            path: "/archive/:id",
+            method: Methods.PATCH,
+            handler: controller.archiveTaskCompleteHandler,
+            localMiddleware: [
+                validation(paramSchema, "param"),
+                Permission.adminPermissions
+            ],
+            auth: true
+        },
 
         {
             path: "/:id",

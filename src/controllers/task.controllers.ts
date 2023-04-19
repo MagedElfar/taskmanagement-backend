@@ -186,6 +186,25 @@ export default class TaskController extends Controller {
         }
     };
 
+    async archiveTaskCompleteHandler(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+
+            const userId = req.user?.id!;
+
+            const { id } = req.params;
+
+            await this.taskServices.archiveTask(userId, +id!)
+
+            super.setResponseSuccess({
+                res,
+                status: 200,
+            })
+
+        } catch (error) {
+            next(error)
+        }
+    };
+
     async deleteTaskHandler(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
 

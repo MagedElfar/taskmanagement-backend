@@ -28,7 +28,8 @@ export interface ITask extends Model {
     userId: number;
     projectId?: number,
     parentId?: number,
-    is_complete?: boolean
+    is_complete?: boolean,
+    is_archived?: boolean
 }
 
 
@@ -125,7 +126,6 @@ export class TakRepository extends BaseRepository<ITask>{
 
             const count = await query.clone().count('tasks.id as CNT').first();
 
-            console.log(data)
             return {
                 data,
                 count: count?.CNT

@@ -242,6 +242,26 @@ export default class TaskServices {
         }
     }
 
+    async archiveTask(userId: number, taskId: number) {
+        try {
+
+            let task = await this.QueryServices().where("id", "=", taskId).first();
+
+            await this.taskRepo.update(taskId, {
+                is_archived: !task.is_archived
+            });
+
+            await this.activityServices.addActivity({
+                taskId: task.id,
+                activity: `${!task.is_archived ? "add this task to archive" : "remove this task from archive"}`,
+                user1_Id: userId
+            })
+
+        } catch (error) {
+            throw error;
+        }
+    }
+
     async delete(taskId: number) {
         try {
 

@@ -9,6 +9,7 @@ export const up = function (knex: Knex) {
             table.enu("status", ["to do", "in progress", "in review", "done", "blocked"])
                 .defaultTo("to do");
             table.boolean("is_complete").defaultTo(false)
+            table.boolean("is_archived").defaultTo(false)
             table.enu("priority", ["low", "medium", "heigh"]).defaultTo("low")
             table.date("due_date").nullable();
 
