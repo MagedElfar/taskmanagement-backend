@@ -111,7 +111,8 @@ export class TakRepository extends BaseRepository<ITask>{
 
             })
 
-            query.groupBy("tasks.id")
+            query.groupBy('tasks.id')
+
 
 
             const tasksQuery = query.clone()
@@ -124,11 +125,11 @@ export class TakRepository extends BaseRepository<ITask>{
 
             const data = await tasksQuery.orderBy(orderBy, order);
 
-            const count = await query.clone().count('tasks.id as CNT').first();
-
+            const count = (await query.clone()).length
+            console.log(count)
             return {
                 data,
-                count: count?.CNT
+                count
             }
         } catch (error) {
             console.log(error)

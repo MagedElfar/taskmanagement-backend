@@ -53,7 +53,7 @@ const taskAttachmentSchema = Joi.object({
 const getTaskSSchema = Joi.object({
     spaceId: Joi.number().optional(),
     project: Joi.number(),
-    term: Joi.string().optional(),
+    term: Joi.string().allow("").optional(),
     page: Joi.number()
         .when('limit', { is: Joi.exist(), then: Joi.required(), otherwise: Joi.optional() }),
     limit: Joi.number().optional(),
