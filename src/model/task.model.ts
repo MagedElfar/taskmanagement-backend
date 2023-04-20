@@ -71,7 +71,18 @@ export class TakRepository extends BaseRepository<ITask>{
         try {
             const query = this.db(this.tableName)
 
-            const { user, userId, parentId, page, limit, order = "desc", orderBy = "created_at", ...others } = getTaskDto
+            const {
+                user,
+                userId,
+                parentId,
+                page,
+                limit,
+                order = "desc",
+                orderBy = "created_at",
+                fromDate = null,
+                toDate = null,
+                ...others
+            } = getTaskDto
 
             if (parentId) {
                 return await query.where({ parentId }).select("*")
@@ -98,10 +109,11 @@ export class TakRepository extends BaseRepository<ITask>{
 
             if (user) {
                 query.where("member.userId", "=", userId!)
-                    .orWhere("tasks.userId", "=", userId!)
             }
 
+
             Object.keys(others).forEach((key: string) => {
+
                 if (key === "term") {
                     query.andWhere("tasks.title", "like", `%${others[key]}%`)
                     return
@@ -110,6 +122,16 @@ export class TakRepository extends BaseRepository<ITask>{
                 query.andWhere(`tasks.${key}`, "=", others[key])
 
             })
+
+
+
+            if (toDate && fromDate) {
+                query.andWhereBetween("tasks.due_date", [fromDate, toDate])
+            } else if (fromDate) {
+                query.andWhere('tasks.due_date', '>=', fromDate)
+            } else if (toDate) {
+                query.andWhere('tasks.due_date', '<=', toDate)
+            }
 
             query.groupBy('tasks.id')
 

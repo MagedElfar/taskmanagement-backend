@@ -61,7 +61,13 @@ const getTaskSSchema = Joi.object({
     orderBy: Joi.string().optional().valid("created_at", "due_date", "position"),
     order: Joi.string().optional().valid("desc", "asc"),
     status: Joi.string().optional().valid(...Object.values(TaskStatus)),
-    is_archived: Joi.number().optional()
+    is_archived: Joi.number().optional(),
+    fromDate: Joi.date().optional().format('YYYY-MM-DD'),
+    toDate: Joi.date().format('YYYY-MM-DD').when('fromDate', {
+        is: Joi.exist(),
+        then: Joi.date().min(Joi.ref('fromDate')),
+        otherwise: Joi.optional()
+    })
 }).or('spaceId', 'user');
 
 export {
