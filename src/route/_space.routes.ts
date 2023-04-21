@@ -1,6 +1,6 @@
 import Controller, { APIRoute, Methods } from '../app/controller';
 import validation from "../middleware/validation.middleware"
-import { getSpacesSchema, spaceSchema } from '../utils/_space-validation-schema';
+import { getSpacesSchema, reportSchema, spaceSchema } from '../utils/_space-validation-schema';
 import PermissionsFactory from "../middleware/permissions.middleware"
 import { paramSchema } from '../utils/_commen-validation-schema';
 
@@ -67,6 +67,17 @@ const routes: (controller: Controller) => APIRoute[] = (controller: any) => {
             ],
             auth: true
         },
+        {
+            path: "/report/:id",
+            method: Methods.GET,
+            handler: controller.reportHandler,
+            localMiddleware: [
+                validation(paramSchema, "param"),
+                validation(reportSchema, "query"),
+                Permission.memberPermissions
+            ],
+            auth: true
+        }
 
     ]
     return r;

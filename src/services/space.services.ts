@@ -83,4 +83,18 @@ export default class SpaceServices {
             throw error
         }
     }
+
+    async spaceReport(spaceId: number, option: { toDate?: string, fromDate?: string }) {
+        try {
+            const spaceReport = await this.spaceRepo.spaceReport(spaceId, option)
+            const teamReport = await this.spaceRepo.spaceTeamReport(spaceId, option)
+
+            return {
+                spaceReport,
+                teamReport
+            }
+        } catch (error) {
+            throw error
+        }
+    }
 }

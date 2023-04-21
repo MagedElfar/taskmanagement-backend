@@ -165,7 +165,9 @@ const routes: (controller: Controller) => APIRoute[] = (controller: any) => {
                 AttachPermission.memberPermissions
             ],
             auth: true
-        }
+        },
+
+
     ]
     return r;
 }

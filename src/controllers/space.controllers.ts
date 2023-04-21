@@ -176,4 +176,23 @@ export default class SpaceController extends Controller {
             next(error)
         }
     };
+
+    async reportHandler(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+
+
+            const { id } = req.params
+
+            const report = await this.spaceServices.spaceReport(+id, req.query)
+
+            super.setResponseSuccess({
+                res,
+                status: 200,
+                data: { report }
+            })
+
+        } catch (error) {
+            next(error)
+        }
+    };
 }
