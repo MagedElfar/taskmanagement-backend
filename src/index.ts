@@ -7,7 +7,6 @@ import routes from "./route";
 import cookieParser from "cookie-parser"
 import config from "./config";
 
-
 const app: Application = express();
 
 const server: Server = new Server(app);

@@ -16,7 +16,6 @@ export default class TaskServices {
     private readonly taskRepo: TakRepository;
     private readonly assigneeServices: AssigneeServices;
     private readonly teamService: TeamServices;
-    private readonly activityServices: ActivityServices;
     private readonly projectServices: ProjectServices;
     private readonly taskAttachmentServices: TaskAttachmentServices = Container.get(TaskAttachmentServices);
     private readonly storageService: StorageService = Container.get(StorageService)
@@ -27,14 +26,12 @@ export default class TaskServices {
         @Inject() taskRepo: TakRepository,
         @Inject() assigneeServices: AssigneeServices,
         @Inject() teamService: TeamServices,
-        @Inject(type => ActivityServices) activityServices: ActivityServices,
         @Inject() projectServices: ProjectServices
 
     ) {
         this.taskRepo = taskRepo;
         this.assigneeServices = assigneeServices;
         this.teamService = teamService;
-        this.activityServices = activityServices;
         this.projectServices = projectServices
     }
 
@@ -81,14 +78,9 @@ export default class TaskServices {
                 userId
             })
 
-            await this.activityServices.addActivity({
-                taskId: task.id,
-                activity: "created the task",
-                user1_Id: userId
-            })
 
             if (data?.memberId) {
-                const assign = await this.assign(userId, {
+                const { assign } = await this.assign({
                     taskId: task.id,
                     memberId: data.memberId
                 })
@@ -125,7 +117,7 @@ export default class TaskServices {
         }
     }
 
-    async update(userId: number, taskId: number, data: Partial<ITask>) {
+    async update(taskId: number, data: Partial<ITask>) {
         try {
 
 
@@ -142,24 +134,6 @@ export default class TaskServices {
 
             const task = await this.taskRepo.update(taskId, data);
 
-            const { spaceId, projectId, ...others } = data;
-
-            await Promise.all(Object.keys(others).map(async (key: string) => {
-                if (key === "due_date" && data[key] === null) {
-                    return await this.activityServices.addActivity({
-                        taskId: task.id,
-                        activity: `change task ${key} to no due date`,
-                        user1_Id: userId
-                    })
-                }
-                await this.activityServices.addActivity({
-                    taskId: task.id,
-                    activity: `change task ${key} to ${data[key]}`,
-                    user1_Id: userId
-                })
-
-            }))
-
             return task
         } catch (error) {
             throw error;
@@ -167,25 +141,19 @@ export default class TaskServices {
     }
 
 
-    async updateStatus(userId: number, taskId: number, status: TaskStatus) {
+    async updateStatus(taskId: number, status: TaskStatus) {
         try {
 
             const task = await this.taskRepo.update(taskId, {
                 status
             });
 
-            await this.activityServices.addActivity({
-                taskId: task.id,
-                activity: `update task status to ${status}`,
-                user1_Id: userId
-            })
-
         } catch (error) {
             throw error;
         }
     }
 
-    async updateTaskStatusWithOrder(userId: number, taskId: number, status: TaskStatus, position: number) {
+    async updateTaskStatusWithOrder(taskId: number, status: TaskStatus, position: number) {
         try {
             const task = await this.QueryServices().where({ id: taskId }).first();
 
@@ -193,7 +161,7 @@ export default class TaskServices {
 
             const currentStatus = task.status;
 
-            if (currentStatus !== status) await this.updateStatus(userId, taskId, status)
+            if (currentStatus !== status) await this.updateStatus(taskId, status)
 
             const currentPosition = task["position"];
 
@@ -222,40 +190,29 @@ export default class TaskServices {
         }
     }
 
-    async markTaskCompleat(userId: number, taskId: number) {
+    async markTaskCompleat(taskId: number) {
         try {
 
             let task = await this.QueryServices().where("id", "=", taskId).first();
 
-            await this.taskRepo.update(taskId, {
+            return await this.taskRepo.update(taskId, {
                 is_complete: !task.is_complete
             });
 
-            await this.activityServices.addActivity({
-                taskId: task.id,
-                activity: `mark this task ${!task.is_complete ? "as complete" : "as incomplete"}`,
-                user1_Id: userId
-            })
 
         } catch (error) {
             throw error;
         }
     }
 
-    async archiveTask(userId: number, taskId: number) {
+    async archiveTask(taskId: number) {
         try {
 
             let task = await this.QueryServices().where("id", "=", taskId).first();
 
-            await this.taskRepo.update(taskId, {
+            return await this.taskRepo.update(taskId, {
                 is_archived: !task.is_archived
             });
-
-            await this.activityServices.addActivity({
-                taskId: task.id,
-                activity: `${!task.is_archived ? "add this task to archive" : "remove this task from archive"}`,
-                user1_Id: userId
-            })
 
         } catch (error) {
             throw error;
@@ -282,7 +239,7 @@ export default class TaskServices {
         }
     }
 
-    async assign(userId: number, data: Partial<IAssignee>) {
+    async assign(data: Partial<IAssignee>) {
         try {
 
             let assign = await this.assigneeServices.findOne({
@@ -299,33 +256,21 @@ export default class TaskServices {
 
             assign = await this.assigneeServices.crate(data);
 
-            await this.activityServices.addActivity({
-                taskId: data.taskId,
-                activity: "assign the task to",
-                user1_Id: userId,
-                user2_Id: member.userId
-            })
-
-            return assign;
+            return { assign, member };
 
         } catch (error) {
             throw error;
         }
     }
 
-    async unAssign(userId: number, assignmentId: number) {
+    async unAssign(assignmentId: number) {
         try {
 
             const assign = await this.assigneeServices.findOne(assignmentId);
 
             await this.assigneeServices.delete(assignmentId)
 
-            await this.activityServices.addActivity({
-                taskId: assign.taskId,
-                activity: "unassign",
-                user1_Id: userId,
-                user2_Id: assign.userId
-            })
+            return assign
 
             return;
 

@@ -21,8 +21,8 @@ const getSpacesSchema = Joi.object({
 });
 
 const reportSchema = Joi.object({
-    fromDate: Joi.date().format('YYYY-MM-DD'),
-    toDate: Joi.date().format('YYYY-MM-DD').min(Joi.ref('fromDate')),
+    fromDate: Joi.date().format('YYYY-MM-DD HH:mm:ss'),
+    toDate: Joi.date().format('YYYY-MM-DD HH:mm:ss').min(Joi.ref('fromDate')),
 })
     .when(Joi.object({ fromDate: Joi.exist() }), { then: Joi.object({ toDate: Joi.required() }) })
     .when(Joi.object({ toDate: Joi.exist() }), { then: Joi.object({ fromDate: Joi.required() }) })

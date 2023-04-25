@@ -5,6 +5,9 @@ import { requestErrorFormat } from '../utils/error-format';
 import Controller from './controller'
 import config from '../config';
 import UnHandledRoutes from '../controllers/undefined-routs.controllers';
+import { Server as SocketServer, Socket } from 'socket.io';
+import http from "http";
+import SocketServices from '../services/Socket.services';
 
 declare global {
     namespace Express {
@@ -26,12 +29,18 @@ export default class Server {
     }
 
     run(): void {
-        this.app.listen(this.port, () => {
+        const server = http.createServer(this.app)
+        server.listen(this.port, () => {
             console.log(`server is running on port ${this.port}...`)
         })
+
+        SocketServices.initIo(server)
+
     }
 
     loadMiddleware(middleware: RequestHandler[]): void {
+        const io = require('socket.io')(http);
+
         middleware.forEach((mid: RequestHandler) => {
             this.app.use(mid)
         });

@@ -61,6 +61,8 @@ export class SpaceRepository extends BaseRepository<ISpace>{
                 .where("spaces.id", "=", id)
                 .groupBy('status')
 
+            console.log(fromDate, toDate)
+
             if (toDate && fromDate) {
                 query.andWhereBetween("tasks.created_at", [fromDate, toDate])
             }
