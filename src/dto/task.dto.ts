@@ -1,4 +1,3 @@
-import { TaskPRIORITY } from './../model/task.model';
 export class GetTasksDto {
     [key: string]: any
     parentId?: number;

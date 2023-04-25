@@ -13,9 +13,17 @@ export const up = function (knex: Knex) {
 
             table.integer("task_id").unsigned().nullable();
 
-            table.integer("userId").unsigned().notNullable();
+            table.integer("receiver").unsigned().notNullable();
 
-            table.foreign("userId")
+            table.integer("sender").unsigned().notNullable();
+
+            table.foreign("receiver")
+                .references("id").
+                inTable("users")
+                .onUpdate("CASCADE")
+                .onDelete("CASCADE")
+
+            table.foreign("sender")
                 .references("id").
                 inTable("users")
                 .onUpdate("CASCADE")

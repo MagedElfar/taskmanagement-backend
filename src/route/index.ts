@@ -19,6 +19,8 @@ import ActivityServices from '../services/activity.services';
 import ActivityController from '../controllers/activity.controllers';
 import ProjectServices from '../services/project.services';
 import ProjectController from '../controllers/project.controllers';
+import NotificationController from '../controllers/notification.controllers';
+import NotificationServices from '../services/notification.services';
 
 
 const routes: Controller[] = [
@@ -52,7 +54,8 @@ const routes: Controller[] = [
         "/tasks",
         Container.get(TaskServices),
         Container.get(TaskAttachmentServices),
-        Container.get(ActivityServices)
+        Container.get(ActivityServices),
+        Container.get(NotificationServices)
     ),
 
     new CommentController(
@@ -68,6 +71,11 @@ const routes: Controller[] = [
     new ProjectController(
         "/projects",
         Container.get(ProjectServices)
+    ),
+
+    new NotificationController(
+        "/notifications",
+        Container.get(NotificationServices)
     )
 
 ]

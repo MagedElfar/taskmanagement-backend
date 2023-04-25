@@ -5,32 +5,38 @@ import { Inject } from "typedi";
 import TaskServices from "../services/task.services";
 import TaskAttachmentServices from "../services/task_attachments.services";
 import ActivityServices from "../services/activity.services";
+import NotificationServices from "../services/notification.services";
 
 
 export default class TaskController extends Controller {
     protected routes: APIRoute[];
     private readonly taskServices: TaskServices;
     private readonly taskAttachmentServices: TaskAttachmentServices;
-    private readonly activityServices: ActivityServices
+    private readonly activityServices: ActivityServices;
+    private readonly notificationServices: NotificationServices
 
     constructor(
         path: string,
         @Inject() taskServices: TaskServices,
         @Inject() taskAttachmentServices: TaskAttachmentServices,
         @Inject() activityServices: ActivityServices,
+        @Inject() notificationServices: NotificationServices
 
     ) {
         super(path);
         this.routes = routes(this);
         this.taskServices = taskServices;
         this.taskAttachmentServices = taskAttachmentServices;
-        this.activityServices = activityServices
+        this.activityServices = activityServices,
+            this.notificationServices = notificationServices
+
     }
 
     async getTasksHandler(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
 
             const userId = req.user?.id!;
+
 
             const tasks = await this.taskServices.find({
                 ...req.query,
@@ -61,18 +67,12 @@ export default class TaskController extends Controller {
                 task = await this.taskServices.create(userId, req.body)
             }
 
-
+            res.locals.task = task;
 
             super.setResponseSuccess({
                 res,
                 status: 201,
                 data: { task }
-            })
-
-            await this.activityServices.addActivity({
-                taskId: task.id,
-                activity: "created the task",
-                user1_Id: userId
             })
 
         } catch (error) {
@@ -118,37 +118,17 @@ export default class TaskController extends Controller {
     async updateTaskHandler(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
 
-            const userId = req.user?.id!;
-
             const { id } = req.params;
 
             const task = await this.taskServices.update(+id!, req.body)
+
+            res.locals.task = task;
 
             super.setResponseSuccess({
                 res,
                 status: 200,
                 data: { task }
             })
-
-            const data = req.body;
-
-            const { spaceId, projectId, ...others } = data;
-
-            await Promise.all(Object.keys(others).map(async (key: string) => {
-                if (key === "due_date" && data[key] === null) {
-                    return await this.activityServices.addActivity({
-                        taskId: task.id,
-                        activity: `change task ${key} to no due date`,
-                        user1_Id: userId
-                    })
-                }
-                await this.activityServices.addActivity({
-                    taskId: task.id,
-                    activity: `change task ${key} to ${data[key]}`,
-                    user1_Id: userId
-                })
-
-            }))
 
         } catch (error) {
             next(error)
@@ -169,12 +149,6 @@ export default class TaskController extends Controller {
                 status: 200,
             })
 
-            await this.activityServices.addActivity({
-                taskId: +id,
-                activity: `update task status to ${req.body.status}`,
-                user1_Id: userId
-            })
-
         } catch (error) {
             next(error)
         }
@@ -183,21 +157,17 @@ export default class TaskController extends Controller {
     async updateTaskOrderHandler(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
 
-            const userId = req.user?.id!;
-
             const { id } = req.params;
 
-            await this.taskServices.updateTaskStatusWithOrder(+id!, req.body.status, req.body.position)
+            const task = await this.taskServices.updateTaskStatusWithOrder(+id!, req.body.status, req.body.position)
+
+            console.log("resp")
+
+            res.locals.task = task
 
             super.setResponseSuccess({
                 res,
                 status: 200,
-            })
-
-            await this.activityServices.addActivity({
-                taskId: +id,
-                activity: `update task status to ${req.body.status}`,
-                user1_Id: userId
             })
 
         } catch (error) {
@@ -214,15 +184,11 @@ export default class TaskController extends Controller {
 
             const task = await this.taskServices.markTaskCompleat(+id!)
 
+            res.locals.task = task;
+
             super.setResponseSuccess({
                 res,
                 status: 200,
-            })
-
-            await this.activityServices.addActivity({
-                taskId: +id,
-                activity: `mark this task ${task.is_complete ? "as complete" : "as incomplete"}`,
-                user1_Id: userId
             })
 
         } catch (error) {
@@ -239,15 +205,10 @@ export default class TaskController extends Controller {
 
             const task = await this.taskServices.archiveTask(+id!)
 
+            res.locals.task = task
             super.setResponseSuccess({
                 res,
                 status: 200,
-            })
-
-            await this.activityServices.addActivity({
-                taskId: task.id,
-                activity: `${task.is_archived ? "add this task to archive" : "remove this task from archive"}`,
-                user1_Id: userId
             })
 
         } catch (error) {
@@ -279,19 +240,14 @@ export default class TaskController extends Controller {
 
             const { assign, member } = await this.taskServices.assign(req.body)
 
+            res.locals.assign = assign;
+            res.locals.member = member;
+
             super.setResponseSuccess({
                 res,
                 status: 201,
                 data: { assign }
             })
-
-            await this.activityServices.addActivity({
-                taskId: req.body.taskId,
-                activity: "assign the task to",
-                user1_Id: userId,
-                user2_Id: member.userId
-            })
-
 
         } catch (error) {
             next(error)
@@ -307,16 +263,10 @@ export default class TaskController extends Controller {
 
             const assign = await this.taskServices.unAssign(+id)
 
+            res.locals.assign = assign
             super.setResponseSuccess({
                 res,
                 status: 200,
-            })
-
-            await this.activityServices.addActivity({
-                taskId: assign.taskId,
-                activity: "unassign",
-                user1_Id: userId,
-                user2_Id: assign.userId
             })
 
         } catch (error) {

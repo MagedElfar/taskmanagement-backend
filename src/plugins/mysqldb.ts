@@ -94,6 +94,8 @@ export default abstract class KnexRepository<T> implements BaseRepository<T> {
         }
     }
 
+
+
     async delete(id: number): Promise<boolean> {
         try {
             return await this.qb()

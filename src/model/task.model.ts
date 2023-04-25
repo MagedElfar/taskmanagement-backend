@@ -178,6 +178,7 @@ export class TakRepository extends BaseRepository<ITask>{
                     "assign.id as assignId",
                     "assign.memberId as assignIdMember",
                     "parent.title as parentTsk",
+                    "assignTo.id as assignToId",
                     "assignTo.username as assignToUserName",
                     "assignToImage.image_url as assignToImage_url",
                     "project.name as projectName"

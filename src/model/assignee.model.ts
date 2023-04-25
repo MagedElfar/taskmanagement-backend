@@ -28,7 +28,10 @@ export class AssigneeRepository extends BaseRepository<IAssignee>{
                     "user.id as userId",
                     "user.username",
                     "userImage.image_url as url",
-                    "task.userId as author"
+                    "task.id as taskId",
+                    "task.spaceId as spaceId",
+                    "task.userId as author",
+                    "task.title as title"
                 )
             return typeof id === 'number'
                 ? await query.where('assignees.id', id).first()

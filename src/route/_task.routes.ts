@@ -12,6 +12,7 @@ import {
     updateTaskSchema,
     updateTaskStatus
 } from '../utils/_task-validation-schema';
+import activityMiddleware from '../middleware/activity.middleware';
 
 const Permission = PermissionsFactory.getPermissions("tasks");
 const AssignPermission = PermissionsFactory.getPermissions("assignees");
@@ -37,7 +38,8 @@ const routes: (controller: Controller) => APIRoute[] = (controller: any) => {
             handler: controller.createHandler,
             localMiddleware: [
                 validation(taskSchema),
-                Permission.memberPermissions
+                Permission.memberPermissions,
+                activityMiddleware.createTask
             ],
             auth: true
         },
@@ -60,7 +62,8 @@ const routes: (controller: Controller) => APIRoute[] = (controller: any) => {
             localMiddleware: [
                 validation(paramSchema, "param"),
                 validation(updateTaskSchema),
-                Permission.memberPermissions
+                Permission.memberPermissions,
+                activityMiddleware.updateTask
             ],
             auth: true
         },
@@ -72,7 +75,8 @@ const routes: (controller: Controller) => APIRoute[] = (controller: any) => {
             localMiddleware: [
                 validation(paramSchema, "param"),
                 validation(updateTaskStatus),
-                Permission.memberPermissions
+                Permission.memberPermissions,
+                activityMiddleware.updateStatus
             ],
             auth: true
         },
@@ -84,7 +88,8 @@ const routes: (controller: Controller) => APIRoute[] = (controller: any) => {
             localMiddleware: [
                 validation(paramSchema, "param"),
                 validation(updateTaskOrder),
-                Permission.memberPermissions
+                Permission.memberPermissions,
+                activityMiddleware.changeOrder
             ],
             auth: true
         },
@@ -96,7 +101,8 @@ const routes: (controller: Controller) => APIRoute[] = (controller: any) => {
             handler: controller.markTaskCompleteHandler,
             localMiddleware: [
                 validation(paramSchema, "param"),
-                Permission.memberPermissions
+                Permission.memberPermissions,
+                activityMiddleware.markComplete
             ],
             auth: true
         },
@@ -106,7 +112,8 @@ const routes: (controller: Controller) => APIRoute[] = (controller: any) => {
             handler: controller.archiveTaskCompleteHandler,
             localMiddleware: [
                 validation(paramSchema, "param"),
-                Permission.adminPermissions
+                Permission.adminPermissions,
+                activityMiddleware.archiveTask
             ],
             auth: true
         },
@@ -128,7 +135,8 @@ const routes: (controller: Controller) => APIRoute[] = (controller: any) => {
             handler: controller.assignTaskHandler,
             localMiddleware: [
                 validation(assignTaskSchema),
-                Permission.memberPermissions
+                Permission.memberPermissions,
+                activityMiddleware.assignTask
             ],
             auth: true
         },

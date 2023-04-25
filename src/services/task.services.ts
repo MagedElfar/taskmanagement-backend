@@ -165,7 +165,7 @@ export default class TaskServices {
 
             const currentPosition = task["position"];
 
-            if (currentPosition === position) return
+            if (currentPosition === position) return await this.taskRepo.findOne(taskId)
 
             const direction = position > currentPosition ? "down" : "up";
 
@@ -184,6 +184,8 @@ export default class TaskServices {
                 .where("tasks.id", "=", taskId)
                 // .andWhere("tasks.position", "=", 0)
                 .update({ position })
+
+            return await this.taskRepo.findOne(taskId)
 
         } catch (error) {
             throw error;

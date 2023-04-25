@@ -1,4 +1,5 @@
 import socketIo, { Server, Socket } from "socket.io";
+import { ITask } from "../model/task.model";
 
 interface SocketUser {
     socketId: string;
@@ -52,6 +53,20 @@ class SocketService {
 
                 socket.join(`space-${data.spaceId}-room`)
             });
+
+            //tasks
+
+            socket.on("createTask", (data: ITask) => {
+                socket.to(`space-${data.spaceId}-room`).emit("createTask", data)
+            })
+
+            socket.on("updateTask", (data: ITask) => {
+                socket.to(`space-${data.spaceId}-room`).emit("updateTask", data)
+            })
+
+            socket.on("deleteTask", (data) => {
+                socket.to(`space-${data.spaceId}-room`).emit("deleteTask", data.taskId)
+            })
 
             socket.on("updateAllTasks", (data) => {
 
