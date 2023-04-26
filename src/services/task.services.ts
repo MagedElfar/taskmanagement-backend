@@ -90,7 +90,7 @@ export default class TaskServices {
                 task.assignToImage_url = assign.url
             }
 
-            return task;
+            return await this.taskRepo.findOne(task.id);
         } catch (error) {
             throw error;
         }

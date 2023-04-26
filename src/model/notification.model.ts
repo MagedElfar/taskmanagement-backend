@@ -32,8 +32,10 @@ export class NotificationRepository extends BaseRepository<INotification>{
                 page
             } = getNotificationDto
 
+            console.log("getNotificationDto = ", getNotificationDto)
+
             query
-                .leftJoin("tasks", "tasks.id", "=", "notifications.taskId")
+                .leftJoin("tasks", "tasks.id", "=", "notifications.task_id")
                 .leftJoin("users as sender", "sender.id", "=", "notifications.sender")
                 .leftJoin("profiles_images as image", "image.userId", "=", "sender.id")
                 .leftJoin("profiles as profile", "sender.id", "=", "profile.userId")
@@ -48,8 +50,8 @@ export class NotificationRepository extends BaseRepository<INotification>{
 
 
             const notificationQuery = query
-                .where("space_id", "=", space_id)
-                .andWhere("receiver", "=", receiver)
+                .where("notifications.space_id", "=", space_id)
+                .andWhere("notifications.receiver", "=", receiver)
                 .clone()
 
             if (limit) {

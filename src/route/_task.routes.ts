@@ -147,7 +147,8 @@ const routes: (controller: Controller) => APIRoute[] = (controller: any) => {
             handler: controller.unassignTaskHandler,
             localMiddleware: [
                 validation(paramSchema, "param"),
-                AssignPermission.memberPermissions
+                AssignPermission.memberPermissions,
+                activityMiddleware.unAssignTask
             ],
             auth: true
         },

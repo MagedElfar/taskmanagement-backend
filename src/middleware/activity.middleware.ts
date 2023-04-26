@@ -42,6 +42,7 @@ class ActivityMiddleware {
 
 
     createTask = async (req: Request, res: Response, next: NextFunction) => {
+        const userId = req.user?.id;
         try {
             await new Promise<void>((resolve) => {
                 res.on('finish', async () => {
@@ -50,18 +51,18 @@ class ActivityMiddleware {
                         await this.activityServices.addActivity({
                             taskId: task.id,
                             activity: "created the task",
-                            user1_Id: req.user?.id
+                            user1_Id: userId
                         })
 
-                        // if (task?.assignId) {
-                        //     await this.notificationServices.addNotification({
-                        //         sender: userId,
-                        //         receiver: task.assignToId,
-                        //         text: `assign <strong>${task.title}</strong> to you`,
-                        //         task_id: task.id,
-                        //         space_id: task.spaceId
-                        //     })
-                        // }
+                        if (task?.assignId) {
+                            await this.notificationServices.addNotification({
+                                sender: userId,
+                                receiver: task.assignToId,
+                                text: `assign <strong>${task.title}</strong> to you`,
+                                task_id: task.id,
+                                space_id: task.spaceId
+                            })
+                        }
 
                     }
                     resolve()
@@ -77,6 +78,7 @@ class ActivityMiddleware {
 
     updateTask = async (req: Request, res: Response, next: NextFunction) => {
         try {
+            const userId = req.user?.id;
             await new Promise<void>((resolve) => {
                 res.on('finish', async () => {
                     if (res.locals.task) {
@@ -98,20 +100,20 @@ class ActivityMiddleware {
                             await this.activityServices.addActivity({
                                 taskId: task.id,
                                 activity: `change task ${key} to ${data[key]}`,
-                                user1_Id: req.user?.id
+                                user1_Id: userId
                             })
 
                         }))
 
-                        // if (task?.assignId) {
-                        //     await this.notificationServices.addNotification({
-                        //         sender: userId,
-                        //         receiver: task.assignToId,
-                        //         text: `update <strong>${task.title}</strong>`,
-                        //         task_id: task.id,
-                        //         space_id: task.spaceId
-                        //     })
-                        // }
+                        if (task?.assignId) {
+                            await this.notificationServices.addNotification({
+                                sender: userId,
+                                receiver: task.assignToId,
+                                text: `update <strong>${task.title}</strong>`,
+                                task_id: task.id,
+                                space_id: task.spaceId
+                            })
+                        }
                     }
                     resolve()
                 });
@@ -146,6 +148,8 @@ class ActivityMiddleware {
 
     markComplete = async (req: Request, res: Response, next: NextFunction) => {
         try {
+            const userId = req.user?.id;
+
             await new Promise<void>((resolve) => {
                 res.on('finish', async () => {
                     if (res.locals.task) {
@@ -153,18 +157,18 @@ class ActivityMiddleware {
                         await this.activityServices.addActivity({
                             taskId: task.id,
                             activity: `mark this task ${task.is_complete ? "as complete" : "as incomplete"}`,
-                            user1_Id: req.user?.id
+                            user1_Id: userId
                         })
 
-                        // if (task?.assignId) {
-                        //     await this.notificationServices.addNotification({
-                        //         sender: userId,
-                        //         receiver: task.assignToId,
-                        //         text: `mark <strong>${task.title}</strong> is ${task.is_complete ? "as complete" : "as incomplete"}`,
-                        //         task_id: task.id,
-                        //         space_id: task.spaceId
-                        //     })
-                        // }
+                        if (task?.assignId) {
+                            await this.notificationServices.addNotification({
+                                sender: userId,
+                                receiver: task.assignToId,
+                                text: `mark <strong>${task.title}</strong> is ${task.is_complete ? "as complete" : "as incomplete"}`,
+                                task_id: task.id,
+                                space_id: task.spaceId
+                            })
+                        }
                     }
                     resolve()
                 });
@@ -201,23 +205,28 @@ class ActivityMiddleware {
     };
 
     assignTask = async (req: Request, res: Response, next: NextFunction) => {
+        const userId = req.user?.id;
         try {
             await new Promise<void>((resolve) => {
                 res.on('finish', async () => {
+
+                    const assign = res.locals.assign,
+                        member = res.locals.member;
                     await this.activityServices.addActivity({
                         taskId: req.body.taskId,
                         activity: "assign the task to",
-                        user1_Id: req.user?.id,
-                        user2_Id: res.locals.member.userId
+                        user1_Id: userId,
+                        user2_Id: member.userId
                     })
 
-                    // await this.notificationServices.addNotification({
-                    //     sender: userId,
-                    //     receiver: assign.userId,
-                    //     text: `assign <strong>${assign.title}</strong> to you`,
-                    //     task_id: assign.taskId,
-                    //     space_id: assign.spaceId
-                    // })
+
+                    await this.notificationServices.addNotification({
+                        sender: userId,
+                        receiver: assign.userId,
+                        text: `assign <strong>${assign.title}</strong> to you`,
+                        task_id: assign.taskId,
+                        space_id: assign.spaceId
+                    })
                     resolve()
                 });
 
@@ -230,23 +239,28 @@ class ActivityMiddleware {
     }
 
     unAssignTask = async (req: Request, res: Response, next: NextFunction) => {
+        const userId = req.user?.id;
+
         try {
             await new Promise<void>((resolve) => {
                 res.on('finish', async () => {
+                    const assign = res.locals.assign;
+
                     await this.activityServices.addActivity({
                         taskId: res.locals.assign.taskId,
                         activity: "unassign",
-                        user1_Id: req.user?.id,
-                        user2_Id: res.locals.assign.userId
+                        user1_Id: userId,
+                        user2_Id: assign.userId
                     })
 
-                    // await this.notificationServices.addNotification({
-                    //     sender: userId,
-                    //     receiver: assign.userId,
-                    //     text: `unassign <strong>${assign.title}</strong> from you`,
-                    //     task_id: assign.taskId,
-                    //     space_id: assign.spaceId
-                    // })
+                    await this.notificationServices.addNotification({
+                        sender: userId,
+                        receiver: assign.userId,
+                        text: `unassign <strong>${assign.title}</strong> from you`,
+                        task_id: assign.taskId,
+                        space_id: assign.spaceId
+                    })
+
                     resolve()
                 });
 

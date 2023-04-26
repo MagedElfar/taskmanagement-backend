@@ -31,7 +31,7 @@ export const up = function (knex: Knex) {
 
             table.foreign("task_id")
                 .references("id")
-                .inTable("chats")
+                .inTable("tasks")
                 .onUpdate("CASCADE")
                 .onDelete("CASCADE")
 
