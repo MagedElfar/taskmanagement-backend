@@ -94,6 +94,22 @@ export default abstract class KnexRepository<T> implements BaseRepository<T> {
         }
     }
 
+    async updateMany(selector: Partial<T>, item: Partial<T>): Promise<void> {
+        try {
+            const updated_at = new Date()
+
+            await this.qb()
+                .where(selector)
+                .update({
+                    ...item,
+                    updated_at
+                })
+
+        } catch (error) {
+            console.log(error)
+            throw setError(500, "database failure")
+        }
+    }
 
 
     async delete(id: number): Promise<boolean> {
@@ -107,6 +123,16 @@ export default abstract class KnexRepository<T> implements BaseRepository<T> {
         }
     };
 
+    async deleteMany(selector: Partial<T>): Promise<void> {
+        try {
+            return await this.qb()
+                .where(selector)
+                .delete()
+        } catch (error) {
+            console.log(error)
+            throw setError(500, "database failure")
+        }
+    };
 
     async find(item: Partial<T>, option?: any): Promise<any> {
         try {

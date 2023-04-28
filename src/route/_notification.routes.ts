@@ -15,7 +15,42 @@ const routes: (controller: Controller) => APIRoute[] = (controller: any) => {
             handler: controller.getNotificationsHandler,
             localMiddleware: [
                 validation(getNotificationSchema, "query"),
-                Permission.memberPermissions
+            ],
+            auth: true
+        },
+
+        {
+            path: "/",
+            method: Methods.PATCH,
+            handler: controller.markAllReadHandler,
+            localMiddleware: [],
+            auth: true
+        },
+
+        {
+            path: "/:id",
+            method: Methods.PATCH,
+            handler: controller.markReadHandler,
+            localMiddleware: [
+                validation(paramSchema, "param"),
+            ],
+            auth: true
+        },
+
+        {
+            path: "/",
+            method: Methods.DELETE,
+            handler: controller.deleteAllHandler,
+            localMiddleware: [],
+            auth: true
+        },
+
+        {
+            path: "/:id",
+            method: Methods.DELETE,
+            handler: controller.deleteNotificationHandler,
+            localMiddleware: [
+                validation(paramSchema, "param"),
             ],
             auth: true
         }

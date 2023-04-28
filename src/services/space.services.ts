@@ -89,6 +89,7 @@ export default class SpaceServices {
             const spaceReport = await this.spaceRepo.spaceReport(spaceId, option)
             const teamReport = await this.spaceRepo.spaceTeamReport(spaceId, option)
 
+            console.log(teamReport)
             return {
                 spaceReport,
                 teamReport

@@ -1,5 +1,6 @@
 import socketIo, { Server, Socket } from "socket.io";
 import { ITask } from "../model/task.model";
+import { INotification } from "../model/notification.model";
 
 interface SocketUser {
     socketId: string;
@@ -100,6 +101,13 @@ class SocketService {
 
     private removeUser(socket: Socket) {
         this.users = this.users.filter(user => socket.id !== user.socketId)
+    }
+
+    emitNotification(notification: INotification) {
+        const user = this.users.find(user => user.userId === notification.receiver);
+
+        if (!user) return;
+        this.io.to(user.socketId).emit("notification", notification)
     }
 }
 

@@ -32,8 +32,6 @@ export class NotificationRepository extends BaseRepository<INotification>{
                 page
             } = getNotificationDto
 
-            console.log("getNotificationDto = ", getNotificationDto)
-
             query
                 .leftJoin("tasks", "tasks.id", "=", "notifications.task_id")
                 .leftJoin("users as sender", "sender.id", "=", "notifications.sender")
@@ -76,4 +74,29 @@ export class NotificationRepository extends BaseRepository<INotification>{
         }
     }
 
+    async findOne(id: number): Promise<INotification> {
+        try {
+            const query = this.db(this.tableName)
+
+            query
+                .leftJoin("tasks", "tasks.id", "=", "notifications.task_id")
+                .leftJoin("users as sender", "sender.id", "=", "notifications.sender")
+                .leftJoin("profiles_images as image", "image.userId", "=", "sender.id")
+                .leftJoin("profiles as profile", "sender.id", "=", "profile.userId")
+                .select(
+                    "notifications.*",
+                    "tasks.title as title",
+                    "sender.username as username",
+                    "image.image_url as image",
+                    "profile.first_name",
+                    "profile.last_name",
+                )
+
+            return await query.where("notifications.id", "=", id).first()
+
+        } catch (error) {
+            console.log(error)
+            throw setError(500, "database failure")
+        }
+    }
 }

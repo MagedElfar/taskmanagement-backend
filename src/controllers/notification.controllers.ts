@@ -43,4 +43,77 @@ export default class NotificationController extends Controller {
             next(error)
         }
     };
+
+    async markReadHandler(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+
+            const receiver = + req.user?.id!
+
+            const { id } = req.params
+
+            const data = await this.notificationServices.markASRead(receiver, +id)
+
+            super.setResponseSuccess({
+                res,
+                status: 200,
+            })
+
+        } catch (error) {
+            next(error)
+        }
+    };
+
+    async markAllReadHandler(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+
+            const receiver = + req.user?.id!
+
+            const data = await this.notificationServices.markAllIsRead(receiver)
+
+            super.setResponseSuccess({
+                res,
+                status: 200,
+            })
+
+        } catch (error) {
+            next(error)
+        }
+    };
+
+    async deleteNotificationHandler(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+
+            const receiver = + req.user?.id!
+
+            const { id } = req.params
+
+            const data = await this.notificationServices.deleteNotification(receiver, +id)
+
+            super.setResponseSuccess({
+                res,
+                status: 200,
+            })
+
+        } catch (error) {
+            next(error)
+        }
+    };
+
+
+    async deleteAllHandler(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+
+            const receiver = + req.user?.id!
+
+            const data = await this.notificationServices.deleteAll(receiver)
+
+            super.setResponseSuccess({
+                res,
+                status: 200,
+            })
+
+        } catch (error) {
+            next(error)
+        }
+    };
 }

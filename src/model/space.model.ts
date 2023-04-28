@@ -120,7 +120,7 @@ export class SpaceRepository extends BaseRepository<ISpace>{
                 .leftJoin("users as user", "user.id", "=", "teams.userId")
                 .leftJoin("profiles_images as userImg", "userImg.userId", "=", "user.id")
                 .leftJoin("profiles as profile", "profile.userId", "=", "user.id")
-                .where('teams.space', 1)
+                .where('teams.space', id)
                 .groupBy('memberId');
 
             if (toDate && fromDate) {
