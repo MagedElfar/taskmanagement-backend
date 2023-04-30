@@ -73,6 +73,15 @@ export default abstract class KnexRepository<T> implements BaseRepository<T> {
         }
     }
 
+    async createMany(item: Partial<T>[] | T[]) {
+        try {
+            const [output] = await this.qb().insert(item)
+        } catch (error) {
+            console.log(error)
+            throw setError(500, "database failure")
+        }
+    }
+
     async update(id: number, item: Partial<T>): Promise<T> {
         try {
             const updated_at = new Date()

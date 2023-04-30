@@ -21,6 +21,8 @@ import ProjectServices from '../services/project.services';
 import ProjectController from '../controllers/project.controllers';
 import NotificationController from '../controllers/notification.controllers';
 import NotificationServices from '../services/notification.services';
+import ConversationServices from '../services/conversation.services';
+import ConversationController from '../controllers/conversation.controllers';
 
 
 const routes: Controller[] = [
@@ -76,6 +78,11 @@ const routes: Controller[] = [
     new NotificationController(
         "/notifications",
         Container.get(NotificationServices)
+    ),
+
+    new ConversationController(
+        "/conversations",
+        Container.get(ConversationServices)
     )
 
 ]

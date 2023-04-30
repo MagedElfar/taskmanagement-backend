@@ -2,24 +2,24 @@ import type { Knex } from 'knex'
 
 export const up = function (knex: Knex) {
     return knex.schema
-        .createTable("chats", function (table: Knex.TableBuilder) {
+        .createTable("contacts", function (table: Knex.TableBuilder) {
             table.increments();
 
-            table.integer("user1_Id").unsigned().nullable();
+            table.integer("conversation_id").unsigned().notNullable();
 
-            table.integer("user2_Id").unsigned().nullable();
+            table.integer("user_Id").unsigned().notNullable();
 
-            table.foreign("user1_Id")
+            table.foreign("conversation_id")
+                .references("id")
+                .inTable("conversations")
+                .onUpdate("CASCADE")
+                .onDelete("CASCADE")
+
+            table.foreign("user_Id")
                 .references("id")
                 .inTable("users")
                 .onUpdate("CASCADE")
-                .onDelete("SET NULL")
-
-            table.foreign("user2_Id")
-                .references("id")
-                .inTable("users")
-                .onUpdate("CASCADE")
-                .onDelete("SET NULL")
+                .onDelete("CASCADE")
 
             table.timestamps(true, true);
 
@@ -29,5 +29,5 @@ export const up = function (knex: Knex) {
 
 export const down = function (knex: any) {
     return knex.schema
-        .dropTable("chats")
+        .dropTable("contacts")
 };
