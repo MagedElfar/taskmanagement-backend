@@ -33,4 +33,15 @@ export default class ContactServices {
             throw error
         }
     }
+
+    async isAllowedContact(user_Id: number, conversation_id: number) {
+        try {
+            return await this.contactsRepository.isExist({
+                user_Id,
+                conversation_id
+            })
+        } catch (error) {
+            throw error
+        }
+    }
 } 

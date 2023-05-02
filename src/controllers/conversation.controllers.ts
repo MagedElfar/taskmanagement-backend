@@ -42,7 +42,7 @@ export default class ConversationController extends Controller {
 
             const userId = + req.user?.id!
 
-            const conversations = await this.conversationServices.getContacts(userId)
+            const conversations = await this.conversationServices.getContacts({ user_Id: userId })
 
             super.setResponseSuccess({
                 res,

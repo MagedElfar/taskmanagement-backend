@@ -3,6 +3,7 @@ import { setError } from '../utils/error-format';
 import { ConversationsRepository } from '../model/conversations.model';
 import ContactServices from "./contacts.services";
 import UserServices from "./user.services";
+import { IContacts } from "../model/contacts.model";
 
 @Service()
 export default class ConversationServices {
@@ -60,9 +61,9 @@ export default class ConversationServices {
     }
 
 
-    async getContacts(userId: number) {
+    async getContacts(data: IContacts | Partial<IContacts>) {
         try {
-            return await this.contactServices.getContacts({ user_Id: userId })
+            return await this.contactServices.getContacts(data)
         } catch (error) {
             throw error
         }

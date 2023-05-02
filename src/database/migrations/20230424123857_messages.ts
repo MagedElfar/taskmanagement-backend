@@ -7,14 +7,12 @@ export const up = function (knex: Knex) {
 
             table.string("content").notNullable();
 
-            table.boolean("is_read").defaultTo(false)
-
             table.integer("conversation_id").unsigned().notNullable();
             table.integer("sender_id").unsigned().nullable();
 
             table.foreign("conversation_id")
                 .references("id")
-                .inTable("chats")
+                .inTable("conversations")
                 .onUpdate("CASCADE")
                 .onDelete("CASCADE")
 
