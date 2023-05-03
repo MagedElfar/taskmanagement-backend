@@ -16,6 +16,14 @@ export default class MessagesServices {
         return this.messageRepository.qb()
     }
 
+    async getMessages(conversation_id: number, page: number = 1) {
+        try {
+            return await this.messageRepository.find({ conversation_id }, { page })
+        } catch (error) {
+            throw error
+        }
+    }
+
     async createMessage(data: IMessage) {
         try {
             return await this.messageRepository.create(data)

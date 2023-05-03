@@ -15,6 +15,14 @@ const routes: (controller: Controller) => APIRoute[] = (controller: any) => {
         },
 
         {
+            path: "/list",
+            method: Methods.GET,
+            handler: controller.getUsersHandler,
+            localMiddleware: [],
+            auth: true
+        },
+
+        {
             path: "/",
             method: Methods.PUT,
             handler: controller.updateUserHandler,

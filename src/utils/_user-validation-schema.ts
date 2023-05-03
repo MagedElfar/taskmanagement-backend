@@ -48,9 +48,16 @@ const changePasswordRestSchema = Joi.object({
         .required()
 })
 
+const getUsersSchema = Joi.object({
+    term: Joi.string().allow("").optional(),
+    page: Joi.number().optional()
+});
+
+
 
 export {
     profileSchema,
     updateUserSchema,
-    changePasswordRestSchema
+    changePasswordRestSchema,
+    getUsersSchema
 }

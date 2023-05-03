@@ -20,6 +20,14 @@ export default class UserServices {
         return this.userRepo.qb()
     }
 
+    async findUsers(query: any) {
+        try {
+            return await this.userRepo.find({}, query)
+        } catch (error) {
+            throw error
+        }
+    }
+
 
     async findUser(id: number | Partial<IUser>) {
         try {

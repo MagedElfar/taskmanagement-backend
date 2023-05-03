@@ -30,6 +30,9 @@ class SocketService {
             }
         });
 
+        this.io.emit("onlineUsers", this.users)
+
+
         this.io.on("connection", (socket: Socket) => {
 
             this.addNewUser({
@@ -38,10 +41,11 @@ class SocketService {
 
             socket.on("disconnect", () => {
                 this.removeUser(socket)
-                console.log("A user disconnected");
+                this.io.emit("onlineUsers", this.users)
             });
 
             socket.on("newContact", (data: Partial<SocketUser>) => {
+
                 this.updateUser(socket, data);
 
                 socket.rooms.forEach(room => {
@@ -53,6 +57,8 @@ class SocketService {
                 })
 
                 socket.join(`space-${data.spaceId}-room`)
+
+                this.io.emit("onlineUsers", this.users)
             });
 
             //tasks
@@ -87,6 +93,18 @@ class SocketService {
     }
 
     private updateUser(socket: Socket, data: Partial<SocketUser>) {
+        console.log("new user", data)
+        if (!this.users.some(item => item.socketId === socket.id)) {
+            this.users = [
+                ...this.users,
+                {
+                    socketId: socket.id,
+                    ...data
+                }
+            ]
+
+            return;
+        }
         this.users = this.users.map(user => {
             if (socket.id === user.socketId) {
                 return {

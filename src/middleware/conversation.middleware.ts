@@ -17,7 +17,16 @@ export default class ConversationMiddlerWare {
     static isAllowed = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const userId = req.user?.id;
-            const conversation_id = req.body.conversation_id
+            let conversation_id;
+
+            console.log(req.method)
+
+            if (req.method === "GET") {
+                conversation_id = req.query.conversation_id
+            } else {
+                conversation_id = req.body.conversation_id
+            }
+
             const isAllowedContact = await ConversationMiddlerWare.contactServices.isAllowedContact(userId!, conversation_id)
 
             if (!isAllowedContact) throw setError(404, "conversation not found")

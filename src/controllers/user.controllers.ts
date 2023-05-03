@@ -101,6 +101,28 @@ export default class UserController extends Controller {
         }
     };
 
+
+    async getUsersHandler(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+
+            const id = req.user?.id;
+
+            const query = req.query
+
+            const users = await this.userServices.findUsers(query);
+
+            super.setResponseSuccess({
+                res, status: 200,
+                data: {
+                    users
+                }
+            })
+
+        } catch (error) {
+            next(error)
+        }
+    };
+
     async updateUserHandler(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
 

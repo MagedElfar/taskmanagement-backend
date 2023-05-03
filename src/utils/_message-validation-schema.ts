@@ -7,6 +7,13 @@ const createMessageSchema = Joi.object({
 })
 
 
+const getMassagesSchema = Joi.object({
+    page: Joi.number().optional().default(1),
+    conversation_id: Joi.number().required()
+});
+
+
 export {
-    createMessageSchema
+    createMessageSchema,
+    getMassagesSchema
 }

@@ -18,6 +18,26 @@ export default class MessageController extends Controller {
         this.messagesServices = messagesServices
     }
 
+    async getMessagesHandler(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+
+            const { page, conversation_id } = req.query
+
+            const messages = await this.messagesServices.getMessages(+conversation_id!, +page! || 1)
+
+            super.setResponseSuccess({
+                res, status: 200,
+                data: {
+                    messages
+                }
+            })
+
+        } catch (error) {
+            next(error)
+        }
+    };
+
+
     async createMessageHandler(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
 
