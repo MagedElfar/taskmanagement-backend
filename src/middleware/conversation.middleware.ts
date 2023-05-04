@@ -6,6 +6,7 @@ import ConversationServices from "../services/conversation.services";
 import { IMessage } from "../model/message.model";
 import { IMessageReceiver } from "../model/message_receivers,model";
 import MessagesReceiverServices from "../services/message-receiver.services";
+import SocketServices from "../services/Socket.services";
 
 export default class ConversationMiddlerWare {
 
@@ -50,12 +51,12 @@ export default class ConversationMiddlerWare {
                         conversation_id: message.conversation_id
                     })
 
-                    const receivers: Partial<IMessageReceiver>[] = contacts.map((receiver) => {
-                        return {
-                            receiver_id: receiver.user_Id,
-                            message_id: message.id
-                        }
-                    })
+                    SocketServices.emitMassage(message)
+
+                    const receivers: Partial<IMessageReceiver>[] = SocketServices.emitUnreadMassage(
+                        message,
+                        contacts
+                    )
 
                     await ConversationMiddlerWare.messagesReceiverServices.createMany(receivers)
                     resolve()

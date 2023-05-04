@@ -1,5 +1,7 @@
 import { Inject, Service } from "typedi";
 import { IMessage, MessageRepository } from "../model/message.model";
+import * as urlRegex from 'url-regex';
+import linkPreviewGenerator from 'link-preview-js';
 
 @Service()
 export default class MessagesServices {

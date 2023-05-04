@@ -1,11 +1,13 @@
 import socketIo, { Server, Socket } from "socket.io";
 import { ITask } from "../model/task.model";
 import { INotification } from "../model/notification.model";
+import { IMessage } from "../model/message.model";
+import { IMessageReceiver } from "../model/message_receivers,model";
 
 interface SocketUser {
     socketId: string;
     userId?: number;
-    spaceId?: number
+    spaceId?: number,
 }
 
 class SocketService {
@@ -35,9 +37,12 @@ class SocketService {
 
         this.io.on("connection", (socket: Socket) => {
 
+
             this.addNewUser({
-                socketId: socket.id
+                socketId: socket.id,
             })
+
+
 
             socket.on("disconnect", () => {
                 this.removeUser(socket)
@@ -85,6 +90,17 @@ class SocketService {
             socket.on("archiveTask", (data) => {
                 socket.to(`space-${data.task.spaceId}-room`).emit("archiveTask", data)
             })
+
+            //chat room
+            socket.on("joinChatRoom", (data) => {
+                console.log("user join")
+                socket.join(`privateChat-${data.chatId}`)
+            })
+
+            socket.on("leaveChatRoom", (data) => {
+                console.log("user leave")
+                socket.leave(`privateChat-${data.chatId}`)
+            })
         });
     }
 
@@ -99,6 +115,7 @@ class SocketService {
                 ...this.users,
                 {
                     socketId: socket.id,
+                    // socket,
                     ...data
                 }
             ]
@@ -126,6 +143,55 @@ class SocketService {
 
         if (!user) return;
         this.io.to(user.socketId).emit("notification", notification)
+    }
+
+    emitMassage(message: IMessage) {
+        // const user = this.users.find(user => user.userId === notification.receiver);
+
+        this.io.to(`privateChat-${message.conversation_id}`).emit("newMessage", message)
+    }
+
+    emitUnreadMassage(message: IMessage, contacts: { user_Id: number }[]): Partial<IMessageReceiver>[] {
+
+        const receivers: Partial<IMessageReceiver>[] = []
+
+        contacts.forEach(contact => {
+            const socketUser = this.users.find(user => user.userId === contact.user_Id);
+
+            if (!socketUser) {
+                receivers.push({
+                    message_id: message.id,
+                    receiver_id: contact.user_Id,
+                })
+
+                return;
+            }
+
+            const rooms = this.io.sockets.adapter.sids.get(socketUser.socketId);
+
+            console.log(rooms)
+
+            if (rooms?.has(`privateChat-${message.conversation_id}`)) {
+                console.log("mmmmmm")
+                receivers.push({
+                    message_id: message.id,
+                    receiver_id: contact.user_Id,
+                    is_read: true
+                })
+            } else {
+                receivers.push({
+                    message_id: message.id,
+                    receiver_id: contact.user_Id,
+                })
+
+                this.io.to(socketUser.socketId).emit("newUnReadMessage", message)
+            }
+
+            return;
+        });
+
+        return receivers;
+
     }
 }
 
