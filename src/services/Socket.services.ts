@@ -2,7 +2,7 @@ import socketIo, { Server, Socket } from "socket.io";
 import { ITask } from "../model/task.model";
 import { INotification } from "../model/notification.model";
 import { IMessage } from "../model/message.model";
-import { IMessageReceiver } from "../model/message_receivers,model";
+import { IMessageReceiver } from "../model/message_receivers.model";
 
 interface SocketUser {
     socketId: string;
@@ -149,6 +149,12 @@ class SocketService {
         // const user = this.users.find(user => user.userId === notification.receiver);
 
         this.io.to(`privateChat-${message.conversation_id}`).emit("newMessage", message)
+    }
+
+    emitDeleteMassage(message: IMessage) {
+        // const user = this.users.find(user => user.userId === notification.receiver);
+
+        this.io.to(`privateChat-${message.conversation_id}`).emit("deleteMessage", message)
     }
 
     emitUnreadMassage(message: IMessage, contacts: { user_Id: number }[]): Partial<IMessageReceiver>[] {

@@ -25,6 +25,7 @@ import ConversationServices from '../services/conversation.services';
 import ConversationController from '../controllers/conversation.controllers';
 import MessageController from '../controllers/message.controllers';
 import MessagesServices from '../services/message.services';
+import MessagesReceiverServices from '../services/message-receiver.services';
 
 
 const routes: Controller[] = [
@@ -89,7 +90,8 @@ const routes: Controller[] = [
 
     new MessageController(
         "/messages",
-        Container.get(MessagesServices)
+        Container.get(MessagesServices),
+        Container.get(MessagesReceiverServices)
     )
 
 ]

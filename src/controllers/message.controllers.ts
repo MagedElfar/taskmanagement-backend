@@ -3,19 +3,24 @@ import { Request, Response, NextFunction } from "express";
 import routes from "../route/_message.routes";
 import { Inject } from "typedi";
 import MessagesServices from "../services/message.services";
+import MessagesReceiverServices from "../services/message-receiver.services";
 
 
 export default class MessageController extends Controller {
     protected routes: APIRoute[];
-    private readonly messagesServices: MessagesServices
+    private readonly messagesServices: MessagesServices;
+    private readonly messagesReceiverServices: MessagesReceiverServices
+
 
     constructor(
         path: string,
-        @Inject() messagesServices: MessagesServices
+        @Inject() messagesServices: MessagesServices,
+        @Inject() messagesReceiverServices: MessagesReceiverServices
     ) {
         super(path);
         this.routes = routes(this);
-        this.messagesServices = messagesServices
+        this.messagesServices = messagesServices,
+            this.messagesReceiverServices = messagesReceiverServices
     }
 
     async getMessagesHandler(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -61,22 +66,44 @@ export default class MessageController extends Controller {
         }
     };
 
-    // async getConversationsHandler(req: Request, res: Response, next: NextFunction): Promise<void> {
-    //     try {
+    async deleteMessageHandler(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
 
-    //         const userId = + req.user?.id!
+            const userId = + req.user?.id!
+            const { id } = req.params
+            const message = await this.messagesServices.deleteMessage(userId, +id!)
 
-    //         const conversations = await this.conversationServices.getContacts(userId)
+            res.locals.message = message;
 
-    //         super.setResponseSuccess({
-    //             res,
-    //             status: 200,
-    //             data: { conversations }
-    //         })
+            super.setResponseSuccess({
+                res,
+                status: 200,
+            })
 
-    //     } catch (error) {
-    //         next(error)
-    //     }
-    // };
+        } catch (error) {
+            next(error)
+        }
+    };
+
+    async markReadHandler(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+
+            const receiver_id = + req.user?.id!
+            const { id } = req.params
+
+            await this.messagesReceiverServices.markMessageRead({
+                receiver_id,
+                conversation_id: +id
+            })
+
+            super.setResponseSuccess({
+                res,
+                status: 200,
+            })
+
+        } catch (error) {
+            next(error)
+        }
+    };
 
 }

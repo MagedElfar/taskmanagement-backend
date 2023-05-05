@@ -42,12 +42,16 @@ export default class ConversationController extends Controller {
 
             const userId = + req.user?.id!
 
-            const conversations = await this.conversationServices.getContacts({ user_Id: userId })
+            const { contacts, unreadCount } = await this.conversationServices.getContacts({ user_Id: userId })
 
+            console.log(unreadCount)
             super.setResponseSuccess({
                 res,
                 status: 200,
-                data: { conversations }
+                data: {
+                    conversations: contacts,
+                    unreadCount
+                }
             })
 
         } catch (error) {

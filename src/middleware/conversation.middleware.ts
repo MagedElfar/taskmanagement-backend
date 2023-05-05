@@ -4,7 +4,7 @@ import { Request, Response, NextFunction } from "express";
 import { setError } from "../utils/error-format";
 import ConversationServices from "../services/conversation.services";
 import { IMessage } from "../model/message.model";
-import { IMessageReceiver } from "../model/message_receivers,model";
+import { IMessageReceiver } from "../model/message_receivers.model";
 import MessagesReceiverServices from "../services/message-receiver.services";
 import SocketServices from "../services/Socket.services";
 
@@ -46,7 +46,7 @@ export default class ConversationMiddlerWare {
                 res.on('finish', async () => {
                     const message: IMessage = res.locals.message;
 
-                    const contacts = await ConversationMiddlerWare.conversationServices.getContacts({
+                    const { contacts } = await ConversationMiddlerWare.conversationServices.getContacts({
                         user_Id: userId,
                         conversation_id: message.conversation_id
                     })
@@ -60,6 +60,25 @@ export default class ConversationMiddlerWare {
 
                     await ConversationMiddlerWare.messagesReceiverServices.createMany(receivers)
                     resolve()
+                });
+
+                next();
+            });
+
+        } catch (error) {
+            next(error)
+        }
+    };
+
+    static deleteMessage = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            await new Promise<void>((resolve) => {
+                res.on('finish', async () => {
+                    const message: IMessage = res.locals.message;
+
+
+                    SocketServices.emitDeleteMassage(message)
+
                 });
 
                 next();
