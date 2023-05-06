@@ -30,7 +30,7 @@ export class UserRepository extends BaseRepository<IUser>{
                     "users.username",
                     "profile.first_name",
                     "profile.last_name",
-                    "image.image_url"
+                    "image.image_url as image"
                 )
 
 

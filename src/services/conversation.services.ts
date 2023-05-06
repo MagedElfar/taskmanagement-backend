@@ -57,7 +57,9 @@ export default class ConversationServices {
 
             await this.contactServices.createMany(contacts)
 
-            return conversion
+            return await this.contactServices.getContacts({
+                conversation_id: conversion.id,
+            })
 
         } catch (error) {
             throw error

@@ -3,6 +3,7 @@ import validation from "../middleware/validation.middleware"
 import { paramSchema } from '../utils/_commen-validation-schema';
 import PermissionsFactory from '../middleware/permissions.middleware';
 import { createConversationSchema } from '../utils/_conversations-validation-schema';
+import ConversationMiddlerWare from '../middleware/conversation.middleware';
 
 const Permission = PermissionsFactory.getPermissions("tasks");
 
@@ -15,6 +16,7 @@ const routes: (controller: Controller) => APIRoute[] = (controller: any) => {
             handler: controller.createConversationHandler,
             localMiddleware: [
                 validation(createConversationSchema),
+                ConversationMiddlerWare.createConversation
             ],
             auth: true
         },

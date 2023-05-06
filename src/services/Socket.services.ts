@@ -3,6 +3,7 @@ import { ITask } from "../model/task.model";
 import { INotification } from "../model/notification.model";
 import { IMessage } from "../model/message.model";
 import { IMessageReceiver } from "../model/message_receivers.model";
+import { IContacts } from "../model/contacts.model";
 
 interface SocketUser {
     socketId: string;
@@ -143,6 +144,14 @@ class SocketService {
 
         if (!user) return;
         this.io.to(user.socketId).emit("notification", notification)
+    }
+
+    emitNewConnection(data: IContacts, userId: number) {
+        const user = this.users.find(user => user.userId === userId);
+
+        console.log(data)
+        if (!user) return;
+        this.io.to(user.socketId).emit("newChatConnection", data)
     }
 
     emitMassage(message: IMessage) {

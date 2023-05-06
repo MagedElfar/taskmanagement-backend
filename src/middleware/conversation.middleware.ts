@@ -70,6 +70,28 @@ export default class ConversationMiddlerWare {
         }
     };
 
+    static createConversation = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const userId = req.user?.id
+            await new Promise<void>((resolve) => {
+                res.on('finish', async () => {
+                    const contact = res.locals.contact;
+                    const user = res.locals.userId
+
+                    SocketServices.emitNewConnection(contact, user)
+
+
+                    resolve()
+                });
+
+                next();
+            });
+
+        } catch (error) {
+            next(error)
+        }
+    };
+
     static deleteMessage = async (req: Request, res: Response, next: NextFunction) => {
         try {
             await new Promise<void>((resolve) => {

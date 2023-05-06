@@ -1,3 +1,4 @@
+import { IContacts } from './../model/contacts.model';
 import Controller, { APIRoute } from "../app/controller";
 import { Request, Response, NextFunction } from "express";
 import routes from "../route/_conversation.routes";
@@ -26,10 +27,22 @@ export default class ConversationController extends Controller {
 
             const conversation = await this.conversationServices.createConversation(userId, req.body.userId)
 
+            console.log(conversation)
+
+            const contact = conversation.find((contact: IContacts) => contact.user_Id !== userId);
+
+
+
+            res.locals.contact = conversation.find((contact: IContacts) => contact.user_Id === userId);
+
+            res.locals.userId = req.body.userId
+
+
+
             super.setResponseSuccess({
                 res,
                 status: 201,
-                data: { conversation }
+                data: { contact }
             })
 
         } catch (error) {
@@ -44,7 +57,6 @@ export default class ConversationController extends Controller {
 
             const { contacts, unreadCount } = await this.conversationServices.getContacts({ user_Id: userId })
 
-            console.log(unreadCount)
             super.setResponseSuccess({
                 res,
                 status: 200,
