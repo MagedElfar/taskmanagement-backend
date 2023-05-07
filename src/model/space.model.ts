@@ -48,7 +48,7 @@ export class SpaceRepository extends BaseRepository<ISpace>{
             const query = this.db(this.tableName)
                 .leftJoin("tasks", "tasks.spaceId", "=", "spaces.id")
                 .select(
-                    this.db.raw('COUNT(*) AS total_tasks'),
+                    this.db.raw('IFNULL(COUNT(tasks.id), 0) AS total_tasks'),
                     this.db.raw('SUM(tasks.is_complete) AS completed_tasks'),
                     this.db.raw('SUM(tasks.is_archived) AS archived_tasks'),
                     'tasks.status',
@@ -61,8 +61,6 @@ export class SpaceRepository extends BaseRepository<ISpace>{
                 .where("spaces.id", "=", id)
                 .groupBy('status')
 
-            console.log(fromDate, toDate)
-
             if (toDate && fromDate) {
                 query.andWhereBetween("tasks.created_at", [fromDate, toDate])
             }
@@ -70,8 +68,10 @@ export class SpaceRepository extends BaseRepository<ISpace>{
             const result = await query
 
 
+            console.log("result = ", result)
 
             return result.reduce((accumulator, current) => {
+                console.log(current)
                 accumulator.total_tasks += current.total_tasks;
                 accumulator.completed_tasks += parseInt(current.completed_tasks);
                 accumulator.archived_tasks += parseInt(current.archived_tasks);
