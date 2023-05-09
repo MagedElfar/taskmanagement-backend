@@ -5,7 +5,7 @@
   "main": "src/index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "preinstall": "npm i -g typescript",
+    "postinstall": "npm install --save-dev typescript",
     "build": "tsc",
     "dev": "nodemon src/index.ts",
     "start": "node dist/index.js",
