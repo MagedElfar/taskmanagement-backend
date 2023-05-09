@@ -45,7 +45,7 @@ export class AuthorizationMiddleware {
 
     authMiddleware(req: Request, res: Response, next: NextFunction) {
 
-        passport.authenticate("jwt", { session: false }, async (error, decryptToken, jwtError) => {
+        passport.authenticate("jwt", { session: false }, async (error: any, decryptToken: any, jwtError: any) => {
             if (error || jwtError) {
                 return next(setError(401, "ACCESS_TOKEN_EXPIRED"))
             }
