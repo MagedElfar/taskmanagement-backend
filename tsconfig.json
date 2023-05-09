@@ -4,7 +4,7 @@
     "target": "es2016",
     "module": "commonjs",   
     "removeComments": true,      
-    "outDir": "dist",
+    "outDir": "./dist",
     "esModuleInterop": true,
     "noEmitOnError": true,                           
     "forceConsistentCasingInFileNames": true,
