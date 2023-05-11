@@ -11,9 +11,7 @@ const app: Application = express();
 
 const server: Server = new Server(app);
 
-const whitelist = process.env.WHITELISTED_DOMAINS
-    ? process.env.WHITELISTED_DOMAINS.split(",")
-    : ["http://localhost:3000", "https://zdental-app-ds.vercel.app"]
+const whitelist = process.env.WHITELISTED_DOMAINS!.split(",");
 
 server.loadMiddleware([
     cors({

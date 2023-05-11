@@ -4,6 +4,7 @@ import { INotification } from "../model/notification.model";
 import { IMessage } from "../model/message.model";
 import { IMessageReceiver } from "../model/message_receivers.model";
 import { IContacts } from "../model/contacts.model";
+import config from "../config";
 
 interface SocketUser {
     socketId: string;
@@ -29,7 +30,7 @@ class SocketService {
     initIo(server: any) {
         this.io = new Server(server, {
             cors: {
-                origin: 'http://localhost:3000'
+                origin: config.clientUrl
             }
         });
 
