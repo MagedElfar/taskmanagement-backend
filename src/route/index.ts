@@ -26,6 +26,12 @@ import ConversationController from '../controllers/conversation.controllers';
 import MessageController from '../controllers/message.controllers';
 import MessagesServices from '../services/message.services';
 import MessagesReceiverServices from '../services/message-receiver.services';
+import PasswordController from '../controllers/password.controllers';
+import PasswordServices from '../services/password.services';
+import ProfileController from '../controllers/profile.controllers';
+import MediaController from '../controllers/media.controllers';
+import ReportController from '../controllers/report.controllers';
+import ReportServices from '../services/report.services';
 
 
 const routes: Controller[] = [
@@ -34,11 +40,30 @@ const routes: Controller[] = [
         Container.get(AuthServices)
     ),
 
+    new PasswordController(
+        "/password",
+        Container.get(PasswordServices)
+    ),
+
+    new MediaController(
+        "/media",
+        Container.get(ProfileImageServices)
+    ),
+
+    new ReportController(
+        "/report",
+        Container.get(ReportServices)
+    ),
+
     new UserController(
         "/users",
         Container.get(UserServices),
         Container.get(ProfileServices),
-        Container.get(ProfileImageServices)
+    ),
+
+    new ProfileController(
+        "/profiles",
+        Container.get(ProfileServices),
     ),
 
     new SpaceController(

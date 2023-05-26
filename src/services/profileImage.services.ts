@@ -1,20 +1,20 @@
-import { ProfileImageRepository } from './../model/profileImage.model';
+import { ProfileImageRepository } from '../model/profileImage.model';
 import { Inject, Service } from "typedi";
-import StorageService from './storage.services';
 import { setError } from '../utils/error-format';
+import MediaServices from './media.services';
 
 @Service()
 export default class ProfileImageServices {
     private readonly profileImageRepo: ProfileImageRepository;
-    private readonly storageService: StorageService;
+    private readonly mediaServices: MediaServices;
 
     constructor(
 
         @Inject() profileImageRepo: ProfileImageRepository,
-        @Inject() storageService: StorageService
+        @Inject() mediaServices: MediaServices
     ) {
         this.profileImageRepo = profileImageRepo;
-        this.storageService = storageService
+        this.mediaServices = mediaServices
     }
 
 
@@ -22,11 +22,11 @@ export default class ProfileImageServices {
         try {
             const userImg = await this.profileImageRepo.findOne({ userId });
 
-            const storageData: any = await this.storageService.upload(image_url, "users")
+            const storageData: any = await this.mediaServices.uploadMedia(image_url, "users")
 
             if (userImg) {
 
-                await this.storageService.delete(userImg.storage_key);
+                await this.mediaServices.deleteMedia(userImg.storage_key);
 
                 return await this.profileImageRepo.update(userImg.id, {
                     image_url: storageData.secure_url,
@@ -52,7 +52,7 @@ export default class ProfileImageServices {
 
             if (!userImg) throw setError(404, "not found")
 
-            await this.storageService.delete(userImg.storage_key);
+            await this.mediaServices.deleteMedia(userImg.storage_key);
 
             await this.profileImageRepo.delete(userImg.id)
 

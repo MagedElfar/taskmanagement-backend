@@ -95,39 +95,4 @@ export default class AuthController extends Controller {
             next(error)
         }
     }
-
-    async sendForgetPasswordMailHandler(req: Request, res: Response, next: NextFunction) {
-        try {
-
-            await this.authServices.sendForgetPasswordLink(req.body.email)
-
-
-            super.setResponseSuccess({
-                res,
-                status: 200,
-                message: "email has sent"
-            });
-
-        } catch (error) {
-            next(error)
-        }
-    }
-
-    async forgetPasswordHandler(req: Request, res: Response, next: NextFunction) {
-        try {
-
-            await this.authServices.forgetPasswordRest(req.body.token, req.body.password)
-
-            super.setResponseSuccess({
-                res,
-                status: 200,
-                message: "Password rest successfully."
-            });
-
-        } catch (error) {
-            next(error)
-        }
-    }
-
-
 } 

@@ -19,7 +19,7 @@ const routes: (controller: Controller) => APIRoute[] = (controller: any) => {
         },
 
         {
-            path: "/user/init",
+            path: "/init",
             method: Methods.GET,
             handler: controller.getInitSpaceHandler,
             localMiddleware: [],
@@ -64,17 +64,6 @@ const routes: (controller: Controller) => APIRoute[] = (controller: any) => {
             localMiddleware: [
                 validation(paramSchema, "param"),
                 Permission.ownerPermissions
-            ],
-            auth: true
-        },
-        {
-            path: "/report/:id",
-            method: Methods.GET,
-            handler: controller.reportHandler,
-            localMiddleware: [
-                validation(paramSchema, "param"),
-                validation(reportSchema, "query"),
-                Permission.memberPermissions
             ],
             auth: true
         }

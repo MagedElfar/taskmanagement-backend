@@ -5,7 +5,6 @@ import UserServices from "./user.services";
 import * as bcrypt from "bcrypt";
 import TokenHelper from './jwt.services';
 import RefreshTokenServices from "./refreshTokenList.services";
-import NodeMailerServices from "./nodemailer.services";
 import TeamServices from "./team.service";
 import JwtServices from './jwt.services';
 
@@ -15,7 +14,6 @@ export default class AuthServices {
     private readonly userService: UserServices;
     private readonly refreshTokenServices: RefreshTokenServices;
     private readonly tokenHelper: TokenHelper;
-    private readonly nodemailerServices: NodeMailerServices;
     private readonly teamServices: TeamServices;
     private readonly jwtServices: JwtServices;
 
@@ -23,14 +21,12 @@ export default class AuthServices {
         @Inject() userService: UserServices,
         @Inject() refreshTokenServices: RefreshTokenServices,
         @Inject() tokenHelper: TokenHelper,
-        @Inject() nodemailerServices: NodeMailerServices,
         @Inject() teamServices: TeamServices,
         @Inject() jwtServices: JwtServices,
     ) {
         this.userService = userService;
         this.refreshTokenServices = refreshTokenServices;
         this.tokenHelper = tokenHelper;
-        this.nodemailerServices = nodemailerServices;
         this.teamServices = teamServices
         this.jwtServices = jwtServices;
     }
@@ -179,34 +175,5 @@ export default class AuthServices {
     }
 
 
-    async sendForgetPasswordLink(email: string) {
-        try {
-            const user = await this.userService.findOne({ email });
 
-            if (!user) throw setError(400, "user doesn't exist");
-
-            const token = this.tokenHelper.newTokenSign({ id: user.id }, "15m");
-
-            await this.nodemailerServices.sendForgetPasswordMail(token, email)
-
-            return;
-        } catch (error) {
-            throw error;
-        }
-    }
-
-    async forgetPasswordRest(token: string, password: string) {
-        try {
-            const data = this.tokenHelper.verifyToken(token, 400);
-
-            const newPassword = await bcrypt.hash(password, 10);
-
-            await this.userService.update(data.id, { password: newPassword });
-
-            return;
-
-        } catch (error) {
-            throw error
-        }
-    }
 }

@@ -3,8 +3,6 @@ import authorizationMiddleware from '../middleware/authorization.middleware';
 import {
     signupSchema,
     loginSchema,
-    sendForgetPasswordLinkSchema,
-    forgetPasswordRestSchema,
     inviteSignupSchema
 } from '../utils/_aut-validation-schema';
 import validation, { signupValidation } from "../middleware/validation.middleware"
@@ -42,24 +40,7 @@ const routes: (controller: Controller) => APIRoute[] = (controller: any) => {
             handler: controller.logoutHandler,
             localMiddleware: [authorizationMiddleware.refreshTokenExtract],
             auth: true
-        },
-
-        {
-            path: "/forget-password/send-mail",
-            method: Methods.POST,
-            handler: controller.sendForgetPasswordMailHandler,
-            localMiddleware: [validation(sendForgetPasswordLinkSchema)],
-            auth: false
-        },
-
-        {
-            path: "/forget-password/rest",
-            method: Methods.POST,
-            handler: controller.forgetPasswordHandler,
-            localMiddleware: [validation(forgetPasswordRestSchema)],
-            auth: false
-        },
-
+        }
     ]
     return r;
 }

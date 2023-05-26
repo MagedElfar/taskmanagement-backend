@@ -1,10 +1,7 @@
-import { ProfileImageRepository } from './../model/profileImage.model';
 import { UserRepository, IUser } from './../model/user.model';
 import { Inject, Service } from "typedi";
-import StorageService from './storage.services';
 import { setError } from '../utils/error-format';
-import ProfileServices from './profile.services';
-import * as bcrypt from "bcrypt";
+
 
 @Service()
 export default class UserServices {
@@ -84,30 +81,6 @@ export default class UserServices {
     async delete(id: number) {
         try {
             await this.userRepo.delete(id)
-        } catch (error) {
-            throw error
-        }
-    }
-
-    async changePassword(userId: number, data: {
-        password: string,
-        new_password: string
-    }) {
-        try {
-
-            const user = await this.findUser({ id: userId });
-
-            const isSame = await bcrypt.compare(data.password, user.password);
-
-            if (!isSame) throw setError(400, "Invalid Password");
-
-            const newPassword = await bcrypt.hash(data.new_password, 10);
-
-
-            await this.update(userId, { password: newPassword });
-
-            return;
-
         } catch (error) {
             throw error
         }
