@@ -9,7 +9,6 @@ export interface ISpace extends Model {
 }
 
 
-@Service()
 export class SpaceRepository extends BaseRepository<ISpace>{
     constructor() {
         super("spaces")

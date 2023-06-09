@@ -1,19 +1,23 @@
 import Controller, { APIRoute } from "../app/controller";
 import { Request, Response, NextFunction } from "express";
 import routes from "../route/_profile.routes";
-import { Inject } from "typedi";
-import ProfileServices from "../services/profile.services";
+import { IProfileServices } from "../services/profile.services";
+import { autoInjectable, inject } from "tsyringe";
 
-export default class ProfileController extends Controller {
+export interface IProfileController {
+    createProfileHandler(req: Request, res: Response, next: NextFunction): void
+}
+
+@autoInjectable()
+export default class ProfileController extends Controller implements IProfileController {
     protected routes: APIRoute[];
-    private readonly profileService: ProfileServices;
+    private readonly profileService: IProfileServices;
 
     constructor(
-        path: string,
-        @Inject() profileService: ProfileServices,
+        @inject("IProfileServices") profileService: IProfileServices,
 
     ) {
-        super(path);
+        super("/profiles");
         this.profileService = profileService;
         this.routes = routes(this);
     }
@@ -24,7 +28,10 @@ export default class ProfileController extends Controller {
 
             const id = req.user?.id;
 
-            await this.profileService.create(id!, req.body)
+            await this.profileService.create({
+                userId: id!,
+                ...req.body
+            })
 
             super.setResponseSuccess({
                 res,

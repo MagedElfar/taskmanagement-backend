@@ -1,4 +1,5 @@
 import "reflect-metadata";
+// import "./dependencies"
 import express, { Application, urlencoded, json } from "express";
 import Server from "./app/server";
 import cors from "cors";
@@ -6,6 +7,7 @@ import morgan from "morgan";
 import routes from "./route";
 import cookieParser from "cookie-parser"
 import config from "./config";
+
 
 const app: Application = express();
 

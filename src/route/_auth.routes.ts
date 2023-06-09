@@ -6,8 +6,9 @@ import {
     inviteSignupSchema
 } from '../utils/_aut-validation-schema';
 import validation, { signupValidation } from "../middleware/validation.middleware"
+import { IAuthController } from '../controllers/auth.controllers';
 
-const routes: (controller: Controller) => APIRoute[] = (controller: any) => {
+const routes: (controller: IAuthController) => APIRoute[] = (controller: IAuthController) => {
 
     const r: APIRoute[] = [
         {

@@ -1,13 +1,20 @@
-import { ProfileRepository, IProfile } from './../model/profile.model';
-import { Inject, Service } from "typedi";
+import { UpdateProfileDto, CreateProfileDto } from '../dto/profile.dto';
+import { ProfileRepository, IProfile } from '../model/profile.model';
 import { setError } from '../utils/error-format';
+import { autoInjectable, container } from 'tsyringe';
 
-@Service()
-export default class ProfileServices {
+export interface IProfileServices {
+    isExist(data: Partial<IProfile>): Promise<boolean>;
+    create(createProfileDto: CreateProfileDto): Promise<IProfile>;
+    update(updateProfileDto: UpdateProfileDto): Promise<IProfile>
+}
+
+@autoInjectable()
+export class ProfileServices implements IProfileServices {
+
     private readonly profileRepo: ProfileRepository;
 
-
-    constructor(@Inject() profileRepo: ProfileRepository) {
+    constructor(profileRepo: ProfileRepository) {
         this.profileRepo = profileRepo;
     }
 
@@ -19,30 +26,34 @@ export default class ProfileServices {
         }
     }
 
-    async create(userId: number, data: Partial<IProfile>) {
+    async create(createProfileDto: CreateProfileDto) {
         try {
-            const haveProfile = await this.isExist({ userId });
+            const haveProfile = await this.isExist({ userId: createProfileDto.userId });
 
             if (haveProfile) throw setError(400, "user already has profile")
 
-            return await this.profileRepo.create({
-                ...data,
-                userId
-            });
+            return await this.profileRepo.create(createProfileDto);
         } catch (error) {
             throw error;
         }
     }
 
-    async update(userId: number, data: Partial<IProfile>) {
+    async update(updateProfileDto: UpdateProfileDto) {
         try {
-            const userProfile = await this.profileRepo.findOne({ userId })
+            const userProfile = await this.profileRepo.findOne({ userId: updateProfileDto.userId })
 
-            if (!userProfile) return this.create(userId, data)
+            if (!userProfile) return this.create(updateProfileDto)
 
-            return await this.profileRepo.update(userProfile.id, data)
+            return await this.profileRepo.update(userProfile.id, updateProfileDto)
         } catch (error) {
             throw error
         }
     }
 }
+
+
+container.register<IProfileServices>("IProfileServices", { useClass: ProfileServices });
+
+const profileService = container.resolve(ProfileServices);
+
+export default profileService;

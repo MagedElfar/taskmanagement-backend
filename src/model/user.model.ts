@@ -10,7 +10,6 @@ export interface IUser extends Model {
     password: string;
 }
 
-@Service()
 export class UserRepository extends BaseRepository<IUser>{
     constructor() {
         super("users")

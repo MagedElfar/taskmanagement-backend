@@ -1,26 +1,34 @@
 import Controller, { APIRoute } from "../app/controller";
 import { Request, Response, NextFunction } from "express";
 import routes from "../route/_space.routes";
-import { Inject } from "typedi";
-import SpaceServices from "../services/space.services";
-import ProjectServices from "../services/project.services";
-import TeamServices from "../services/team.service";
+import { ISpaceServices } from "../services/space.services";
+import { IProjectServices } from "../services/project.services";
+import { ITeamServices } from "../services/team.service";
+import { autoInjectable, inject } from "tsyringe";
 
+export interface ISpaceController {
+    getSpacesHandler(req: Request, res: Response, next: NextFunction): Promise<void>,
+    getSpaceHandler(req: Request, res: Response, next: NextFunction): Promise<void>,
+    getInitSpaceHandler(req: Request, res: Response, next: NextFunction): Promise<void>,
+    createSpaceHandler(req: Request, res: Response, next: NextFunction): Promise<void>,
+    updateSpaceHandler(req: Request, res: Response, next: NextFunction): Promise<void>,
+    deleteSpaceHandler(req: Request, res: Response, next: NextFunction): Promise<void>
+}
 
-export default class SpaceController extends Controller {
+@autoInjectable()
+export default class SpaceController extends Controller implements ISpaceController {
     protected routes: APIRoute[];
-    private readonly spaceServices: SpaceServices
-    private readonly projectServices: ProjectServices
-    private readonly teamServices: TeamServices
+    private readonly spaceServices: ISpaceServices
+    private readonly projectServices: IProjectServices
+    private readonly teamServices: ITeamServices
 
 
     constructor(
-        path: string,
-        @Inject() spaceServices: SpaceServices,
-        @Inject() projectServices: ProjectServices,
-        @Inject() teamServices: TeamServices
+        @inject("ISpaceServices") spaceServices: ISpaceServices,
+        @inject("IProjectServices") projectServices: IProjectServices,
+        @inject("ITeamServices") teamServices: ITeamServices
     ) {
-        super(path);
+        super("/spaces");
         this.routes = routes(this);
         this.spaceServices = spaceServices;
         this.projectServices = projectServices;
@@ -126,7 +134,10 @@ export default class SpaceController extends Controller {
 
             const id = req.user?.id!;
 
-            const space = await this.spaceServices.create(id, req.body)
+            const space = await this.spaceServices.create({
+                owner: id,
+                ...req.body
+            })
 
             const { team } = await this.teamServices.find({ space: space.id }, {})
 

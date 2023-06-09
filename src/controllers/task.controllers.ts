@@ -5,7 +5,6 @@ import { Inject } from "typedi";
 import TaskServices from "../services/task.services";
 import TaskAttachmentServices from "../services/task_attachments.services";
 import ActivityServices from "../services/activity.services";
-import NotificationServices from "../services/notification.services";
 
 
 export default class TaskController extends Controller {
@@ -13,23 +12,19 @@ export default class TaskController extends Controller {
     private readonly taskServices: TaskServices;
     private readonly taskAttachmentServices: TaskAttachmentServices;
     private readonly activityServices: ActivityServices;
-    private readonly notificationServices: NotificationServices
 
     constructor(
         path: string,
         @Inject() taskServices: TaskServices,
         @Inject() taskAttachmentServices: TaskAttachmentServices,
         @Inject() activityServices: ActivityServices,
-        @Inject() notificationServices: NotificationServices
 
     ) {
         super(path);
         this.routes = routes(this);
         this.taskServices = taskServices;
         this.taskAttachmentServices = taskAttachmentServices;
-        this.activityServices = activityServices,
-            this.notificationServices = notificationServices
-
+        this.activityServices = activityServices;
     }
 
     async getTasksHandler(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -231,87 +226,5 @@ export default class TaskController extends Controller {
         } catch (error) {
             next(error)
         }
-    };
-
-    async assignTaskHandler(req: Request, res: Response, next: NextFunction): Promise<void> {
-        try {
-
-            const userId = req.user?.id!;
-
-            const { assign, member } = await this.taskServices.assign(req.body)
-
-            res.locals.assign = assign;
-            res.locals.member = member;
-
-            super.setResponseSuccess({
-                res,
-                status: 201,
-                data: { assign }
-            })
-
-        } catch (error) {
-            next(error)
-        }
-    };
-
-    async unassignTaskHandler(req: Request, res: Response, next: NextFunction): Promise<void> {
-        try {
-
-            const userId = req.user?.id!;
-
-            const { id } = req.params
-
-            const assign = await this.taskServices.unAssign(+id)
-
-            res.locals.assign = assign
-            super.setResponseSuccess({
-                res,
-                status: 200,
-            })
-
-        } catch (error) {
-            next(error)
-        }
-    };
-
-    async uploadAttachmentHandler(req: Request, res: Response, next: NextFunction): Promise<void> {
-        try {
-
-            const userId = req.user?.id!;
-
-            const attachments = await this.taskAttachmentServices.addAttachment(userId, +req.body.taskId, req.files)
-
-            super.setResponseSuccess({
-                res,
-                status: 201,
-                data: {
-                    attachments
-                }
-            })
-
-        } catch (error) {
-            next(error)
-        }
-    };
-
-    async deleteAttachmentHandler(req: Request, res: Response, next: NextFunction): Promise<void> {
-        try {
-
-            const userId = req.user?.id!;
-
-            const { id } = req.params
-
-            await this.taskAttachmentServices.deleteAtt(userId, +id)
-
-            super.setResponseSuccess({
-                res,
-                status: 200
-            })
-
-        } catch (error) {
-            next(error)
-        }
-    };
-
-
+    }
 }

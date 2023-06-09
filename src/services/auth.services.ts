@@ -1,51 +1,45 @@
-import { Inject, Service } from "typedi";
-import { IUser } from './../model/user.model';
 import { setError } from "../utils/error-format";
-import UserServices from "./user.services";
+import userService, { IUserServices } from "./user.services";
 import * as bcrypt from "bcrypt";
-import TokenHelper from './jwt.services';
-import RefreshTokenServices from "./refreshTokenList.services";
-import TeamServices from "./team.service";
-import JwtServices from './jwt.services';
+import jwtServices, { IJwtServices } from './jwt.services';
+import refreshTokenServices, { IRefreshTokenServices } from "./refreshTokenList.services";
+import teamServices, { ITeamServices } from "./team.service";
+import { LoginDto, SignupDto } from "../dto/auth.dto";
+import { autoInjectable } from "tsyringe";
 
-
-@Service()
-export default class AuthServices {
-    private readonly userService: UserServices;
-    private readonly refreshTokenServices: RefreshTokenServices;
-    private readonly tokenHelper: TokenHelper;
-    private readonly teamServices: TeamServices;
-    private readonly jwtServices: JwtServices;
+export default abstract class AuthServices {
+    protected readonly userService: IUserServices;
+    protected readonly refreshTokenServices: IRefreshTokenServices;
+    protected readonly tokenHelper: IJwtServices;
+    protected readonly teamServices: ITeamServices;
 
     constructor(
-        @Inject() userService: UserServices,
-        @Inject() refreshTokenServices: RefreshTokenServices,
-        @Inject() tokenHelper: TokenHelper,
-        @Inject() teamServices: TeamServices,
-        @Inject() jwtServices: JwtServices,
+        userService: IUserServices,
+        refreshTokenServices: IRefreshTokenServices,
+        tokenHelper: IJwtServices,
+        teamServices: ITeamServices,
     ) {
         this.userService = userService;
         this.refreshTokenServices = refreshTokenServices;
         this.tokenHelper = tokenHelper;
         this.teamServices = teamServices
-        this.jwtServices = jwtServices;
     }
 
-    async signup(data: IUser) {
+    async signup(signupDto: SignupDto) {
         try {
 
-            let isExist = await this.userService.isExist({ username: data.username });
+            let isExist = await this.userService.isExist({ username: signupDto.username });
 
             if (isExist) throw setError(409, "username already exists")
 
-            isExist = await this.userService.isExist({ email: data.email });
+            isExist = await this.userService.isExist({ email: signupDto.email });
 
             if (isExist) throw setError(409, "email already exists")
 
-            const hashedPassword = await bcrypt.hash(data.password, 10);
+            const hashedPassword = await bcrypt.hash(signupDto.password, 10);
 
             const user = await this.userService.create({
-                ...data,
+                ...signupDto,
                 password: hashedPassword
             })
 
@@ -68,40 +62,15 @@ export default class AuthServices {
         }
     }
 
-    async inviteSignup(data: IUser, token: string) {
-        let id = 0;
-        try {
-
-            const decoded = this.jwtServices.verifyToken(token, 400);
-
-            const email = decoded.email;
-
-            if (!email) throw setError(400, "email is required")
-
-            const signup = await this.signup({
-                ...data,
-                email
-            })
-
-            id = signup.user.id
-            await this.teamServices.acceptNewUserInvitation(token, signup.user.id);
-
-            return signup;
-
-        } catch (error) {
-            if (id > 0) await this.userService.delete(id)
-            throw error
-        }
-    }
-    async login(data: IUser) {
+    async login(loginDto: LoginDto) {
         try {
             const user = await this.userService.findOne({
-                email: data.email
+                email: loginDto.email
             })
 
             if (!user) throw setError(401, "Invalid Email Or Password");
 
-            const isSame = await bcrypt.compare(data.password, user.password);
+            const isSame = await bcrypt.compare(loginDto.password, user.password);
 
             if (!isSame) throw setError(401, "Invalid Email Or Password");
 
@@ -154,10 +123,9 @@ export default class AuthServices {
     }
 
 
-    async logout(userId: number, token: string) {
+    async logout(token: string) {
 
         try {
-
             const oldToken = await this.refreshTokenServices.findOne({
                 token
             });
@@ -173,7 +141,58 @@ export default class AuthServices {
             throw error
         }
     }
-
-
-
 }
+
+@autoInjectable()
+export class InviteAuthServices extends AuthServices {
+    constructor() {
+        super(
+            userService,
+            refreshTokenServices,
+            jwtServices,
+            teamServices,
+        )
+    }
+
+    async signup(signupDto: SignupDto) {
+
+        const { token, ...user } = signupDto
+
+        let id = 0;
+        try {
+
+            const decoded = this.tokenHelper.verifyToken(token!, 400);
+
+            const email = decoded.email;
+
+            if (!email) throw setError(400, "email is required")
+
+            const userData = await super.signup({
+                ...user,
+                email
+            })
+
+            id = userData.user.id
+            await this.teamServices.acceptNewUserInvitation(token!, userData.user.id);
+
+            return userData;
+
+        } catch (error) {
+            if (id > 0) await this.userService.delete(id)
+            throw error
+        }
+    }
+}
+
+@autoInjectable()
+export class LocalAuthServices extends AuthServices {
+    constructor() {
+        super(
+            userService,
+            refreshTokenServices,
+            jwtServices,
+            teamServices,
+        )
+    }
+}
+

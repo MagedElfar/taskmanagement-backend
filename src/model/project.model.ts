@@ -1,6 +1,5 @@
-import { Service } from 'typedi';
 import Model from "../app/model";
-import BaseRepository, { oneToManyMapped } from "../plugins/mysqldb";
+import BaseRepository from "../plugins/mysqldb";
 import { setError } from '../utils/error-format';
 
 export interface IProject extends Model {
@@ -10,7 +9,6 @@ export interface IProject extends Model {
 }
 
 
-@Service()
 export class ProjectRepository extends BaseRepository<IProject>{
     constructor() {
         super("projects")

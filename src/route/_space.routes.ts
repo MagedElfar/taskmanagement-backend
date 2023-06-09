@@ -1,13 +1,14 @@
-import Controller, { APIRoute, Methods } from '../app/controller';
+import { APIRoute, Methods } from '../app/controller';
 import validation from "../middleware/validation.middleware"
-import { getSpacesSchema, reportSchema, spaceSchema } from '../utils/_space-validation-schema';
+import { getSpacesSchema, spaceSchema } from '../utils/_space-validation-schema';
 import PermissionsFactory from "../middleware/permissions.middleware"
 import { paramSchema } from '../utils/_commen-validation-schema';
+import { ISpaceController } from '../controllers/space.controllers';
 
 const Permission = PermissionsFactory.getPermissions("spaces")
 
 
-const routes: (controller: Controller) => APIRoute[] = (controller: any) => {
+const routes: (controller: ISpaceController) => APIRoute[] = (controller: ISpaceController) => {
 
     const r: APIRoute[] = [
         {

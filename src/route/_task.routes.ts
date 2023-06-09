@@ -1,12 +1,10 @@
 import Controller, { APIRoute, Methods } from '../app/controller';
-import Multer from '../middleware/multer.middleware';
 import validation from "../middleware/validation.middleware"
 import { paramSchema } from '../utils/_commen-validation-schema';
 import PermissionsFactory from '../middleware/permissions.middleware';
 import {
     assignTaskSchema,
     getTaskSSchema,
-    taskAttachmentSchema,
     taskSchema,
     updateTaskOrder,
     updateTaskSchema,
@@ -16,7 +14,6 @@ import activityMiddleware from '../middleware/activity.middleware';
 
 const Permission = PermissionsFactory.getPermissions("tasks");
 const AssignPermission = PermissionsFactory.getPermissions("assignees");
-const AttachPermission = PermissionsFactory.getPermissions("attachments")
 
 const routes: (controller: Controller) => APIRoute[] = (controller: any) => {
 
@@ -127,56 +124,7 @@ const routes: (controller: Controller) => APIRoute[] = (controller: any) => {
                 Permission.memberPermissions
             ],
             auth: true
-        },
-
-        {
-            path: "/assign",
-            method: Methods.POST,
-            handler: controller.assignTaskHandler,
-            localMiddleware: [
-                validation(assignTaskSchema),
-                Permission.memberPermissions,
-                activityMiddleware.assignTask
-            ],
-            auth: true
-        },
-
-        {
-            path: "/assign/:id",
-            method: Methods.DELETE,
-            handler: controller.unassignTaskHandler,
-            localMiddleware: [
-                validation(paramSchema, "param"),
-                AssignPermission.memberPermissions,
-                activityMiddleware.unAssignTask
-            ],
-            auth: true
-        },
-
-        {
-            path: "/attachment",
-            method: Methods.POST,
-            handler: controller.uploadAttachmentHandler,
-            localMiddleware: [
-                Multer.localUpload().array("file"),
-                validation(taskAttachmentSchema),
-                Permission.memberPermissions
-            ],
-            auth: true
-        },
-
-        {
-            path: "/attachment/:id",
-            method: Methods.DELETE,
-            handler: controller.deleteAttachmentHandler,
-            localMiddleware: [
-                validation(paramSchema, "param"),
-                AttachPermission.memberPermissions
-            ],
-            auth: true
-        },
-
-
+        }
     ]
     return r;
 }

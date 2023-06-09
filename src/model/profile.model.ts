@@ -1,6 +1,6 @@
-import { Service } from 'typedi';
 import Model from "../app/model";
 import BaseRepository from "../plugins/mysqldb";
+import { IUser } from './user.model';
 
 export enum Gender {
     MALE = "male",
@@ -8,7 +8,7 @@ export enum Gender {
 }
 
 export interface IProfile extends Model {
-    userId: number;
+    userId: number | IUser;
     first_name: string;
     last_name: string;
     phone: string;
@@ -16,7 +16,6 @@ export interface IProfile extends Model {
 }
 
 
-@Service()
 export class ProfileRepository extends BaseRepository<IProfile>{
     constructor() {
         super("profiles")

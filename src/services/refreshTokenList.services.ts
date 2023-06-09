@@ -1,11 +1,18 @@
+import { autoInjectable, container } from 'tsyringe';
 import { RefreshTokenRepository, IRefresh_Token } from './../model/refreshTokenList.model';
-import { Inject, Service } from "typedi";
 
-@Service()
-export default class RefreshTokenServices {
+export interface IRefreshTokenServices {
+    create(data: Partial<IRefresh_Token>): Promise<IRefresh_Token>;
+    findOne(data: Partial<IRefresh_Token>): Promise<IRefresh_Token>;
+    update(id: number, data: Partial<IRefresh_Token>): Promise<IRefresh_Token>;
+    delete(id: number): Promise<void>
+}
+
+@autoInjectable()
+export class RefreshTokenServices implements IRefreshTokenServices {
     private readonly tokenRepo: RefreshTokenRepository;
 
-    constructor(@Inject() tokenRepo: RefreshTokenRepository) {
+    constructor(tokenRepo: RefreshTokenRepository) {
         this.tokenRepo = tokenRepo;
     }
 
@@ -35,9 +42,15 @@ export default class RefreshTokenServices {
 
     async delete(id: number) {
         try {
-            return await this.tokenRepo.delete(id)
+            await this.tokenRepo.delete(id);
+            return;
         } catch (error) {
             throw error;
         }
     }
 }
+
+container.register("IRefreshTokenServices", { useClass: RefreshTokenServices });
+const refreshTokenServices = container.resolve(RefreshTokenServices);
+
+export default refreshTokenServices;

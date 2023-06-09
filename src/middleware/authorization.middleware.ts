@@ -3,9 +3,7 @@ import { Strategy, ExtractJwt } from "passport-jwt";
 import { Request, Response, NextFunction } from "express";
 import { setError } from "../utils/error-format"
 import config from '../config'
-import Container from "typedi";
-import { UserRepository } from "../model/user.model";
-import UserServices from "../services/user.services";
+import userService from "../services/user.services";
 
 
 export class AuthorizationMiddleware {
@@ -51,9 +49,7 @@ export class AuthorizationMiddleware {
             }
 
             try {
-                const userSrv = Container.get(UserServices)
-
-                const user = await userSrv.findUser({ id: decryptToken.id });
+                const user = await userService.findUser({ id: decryptToken.id });
                 req.user = user;
                 next()
             } catch (error) {

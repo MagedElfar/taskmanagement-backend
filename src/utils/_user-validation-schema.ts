@@ -5,7 +5,7 @@ const updateUserSchema = Joi.object({
     username: Joi.string()
         .min(3)
         .max(10)
-        .required()
+        .optional()
         .messages({
             "string.min": "username must be at least 3 characters",
             "any.required": "username is required"

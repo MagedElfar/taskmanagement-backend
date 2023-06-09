@@ -1,19 +1,32 @@
 import Controller, { APIRoute } from "../app/controller";
 import { Request, Response, NextFunction } from "express"
 import routes from "../route/_auth.routes";
-import AuthServices from "../services/auth.services";
-import { Inject } from "typedi";
+import AuthServices, { InviteAuthServices, LocalAuthServices } from "../services/auth.services";
 import config from "../config";
+import { autoInjectable } from "tsyringe";
 
+export interface IAuthController {
+    loginHandler(req: Request, res: Response, next: NextFunction): void;
+    signupHandler(req: Request, res: Response, next: NextFunction): void;
+    logoutHandler(req: Request, res: Response, next: NextFunction): void;
+    refreshTokenHandler(req: Request, res: Response, next: NextFunction): void;
+}
 
-export default class AuthController extends Controller {
+@autoInjectable()
+export default class AuthController extends Controller implements IAuthController {
+
     protected routes: APIRoute[] = routes(this);
-    private readonly authServices: AuthServices
+    private readonly authServices: AuthServices;
+    private readonly inviteAuthServices: AuthServices
 
 
-    constructor(path: string, @Inject() authServices: AuthServices) {
-        super(path);
-        this.authServices = authServices
+    constructor(
+        authServices: LocalAuthServices,
+        inviteAuthServices: InviteAuthServices
+    ) {
+        super("");
+        this.authServices = authServices;
+        this.inviteAuthServices = inviteAuthServices
     }
 
     async loginHandler(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -44,7 +57,10 @@ export default class AuthController extends Controller {
             let user;
 
             if (token) {
-                user = await this.authServices.inviteSignup(req.body, token?.toString())
+                user = await this.inviteAuthServices.signup({
+                    ...req.body,
+                    token: token?.toString()
+                })
             } else {
                 user = await this.authServices.signup(req.body)
             }
@@ -66,7 +82,7 @@ export default class AuthController extends Controller {
     async logoutHandler(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
 
-            await this.authServices.logout(req.user?.id!, req.refreshToken!);
+            await this.authServices.logout(req.refreshToken!);
 
             super.setResponseSuccess({
                 res,

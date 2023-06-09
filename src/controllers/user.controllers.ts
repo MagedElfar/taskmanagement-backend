@@ -1,22 +1,27 @@
+import { autoInjectable, container, inject } from "tsyringe";
 import Controller, { APIRoute } from "../app/controller";
 import { Request, Response, NextFunction } from "express";
 import routes from "../route/_user.routes";
-import UserServices from "../services/user.services";
-import { Inject } from "typedi";
-import ProfileServices from "../services/profile.services";
+import { IProfileServices, ProfileServices } from "../services/profile.services";
+import { IUserServices, UserServices } from "../services/user.services";
 
-export default class UserController extends Controller {
+export interface IUserController {
+    getUserHandler(req: Request, res: Response, next: NextFunction): Promise<void>;
+    getUsersHandler(req: Request, res: Response, next: NextFunction): Promise<void>;
+    updateUserHandler(req: Request, res: Response, next: NextFunction): Promise<void>
+}
+
+@autoInjectable()
+export default class UserController extends Controller implements IUserController {
     protected routes: APIRoute[];
-    private readonly userServices: UserServices;
-    private readonly profileService: ProfileServices;
+    private readonly userServices: IUserServices;
+    private readonly profileService: IProfileServices;
 
     constructor(
-        path: string,
-        @Inject() userServices: UserServices,
-        @Inject() profileService: ProfileServices,
-
+        @inject(ProfileServices) profileService: IProfileServices,
+        @inject(UserServices) userServices: IUserServices,
     ) {
-        super(path);
+        super("/users");
         this.userServices = userServices;
         this.profileService = profileService;
         this.routes = routes(this);
@@ -48,7 +53,6 @@ export default class UserController extends Controller {
     async getUsersHandler(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
 
-            const id = req.user?.id;
 
             const query = req.query
 
@@ -73,9 +77,16 @@ export default class UserController extends Controller {
 
             const { username, email, ...profile } = req.body;
 
-            await this.profileService.update(id!, profile)
+            await this.profileService.update({
+                userId: id!,
+                ...profile
+            })
 
-            const { password, ...user } = await this.userServices.update(id!, { username, email })
+            const { password, ...user } = await this.userServices.update({
+                userId: id!,
+                username,
+                email,
+            })
 
             super.setResponseSuccess({ res, status: 200, message: "user updated successfully", data: { user } })
 

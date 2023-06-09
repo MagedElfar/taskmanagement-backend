@@ -1,10 +1,16 @@
-import { Service } from 'typedi';
-import { sign, verify, VerifyErrors } from "jsonwebtoken";
+import { sign, verify } from "jsonwebtoken";
 import config from "../config";
 import { setError } from '../utils/error-format';
+import { autoInjectable, container } from "tsyringe";
 
-@Service()
-export default class JwtServices {
+export interface IJwtServices {
+    newTokenSign(data: any, expiresIn: string): string;
+    authTokens(data: any): { accessToken: string, refreshToken: string };
+    verifyToken(token: string, code: number): any
+}
+
+@autoInjectable()
+export class JwtServices implements IJwtServices {
     newTokenSign(data: any, expiresIn: string) {
         return sign(data, config.jwt.secret!, {
             expiresIn
@@ -49,3 +55,8 @@ export default class JwtServices {
         }
     }
 }
+
+container.register("IJwtServices", { useClass: JwtServices });
+const jwtServices = container.resolve(JwtServices);
+
+export default jwtServices;

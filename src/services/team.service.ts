@@ -1,30 +1,47 @@
+import { CreateTeamDto } from './../dto/team.dto';
 import { TeamRepository, ITeam, Role } from './../model/team.model';
-import { Inject, Service } from "typedi";
 import { setError } from '../utils/error-format';
-import UserServices from './user.services';
-import JwtServices from './jwt.services';
+import { IUserServices } from './user.services';
+import { IJwtServices } from './jwt.services';
 import NodeMailerServices from './nodemailer.services';
 import { SpaceRepository } from '../model/space.model';
+import { autoInjectable, container, inject } from 'tsyringe';
 
-@Service()
-export default class TeamServices {
+export interface ITeamServices {
+    find(data: Partial<ITeam>, querySearch: { limit?: number, page?: number }): Promise<{
+        count: number,
+        team: ITeam[]
+    }>;
+    findOne(data: Partial<ITeam> | number): Promise<ITeam>;
+    create(createTeamDto: CreateTeamDto): Promise<ITeam>;
+    sendInvitation(senderName: string, email: string, spaceId: number): Promise<void>;
+    acceptNewUserInvitation(token: string, userId: number): Promise<ITeam>;
+    acceptInvitation(token: string, user: number): Promise<ITeam>;
+    update(id: number, role: Role): Promise<ITeam>;
+    remove(id: number): Promise<void>;
+    leave(userId: number, id: number): Promise<void>
+
+}
+
+@autoInjectable()
+export class TeamServices implements ITeamServices {
     private readonly teamRepo: TeamRepository;
-    private readonly userService: UserServices;
+    // private readonly userService: IUserServices;
     private readonly spaceService: SpaceRepository;
-    private readonly jwtServices: JwtServices;
+    private readonly jwtServices: IJwtServices;
     private readonly nodeMailerServices: NodeMailerServices
 
     constructor(
-        @Inject() teamRepo: TeamRepository,
-        @Inject() userService: UserServices,
-        @Inject() jwtServices: JwtServices,
-        @Inject() nodeMailerServices: NodeMailerServices,
-        @Inject() spaceService: SpaceRepository
+        @inject("IUserServices") private userService: IUserServices,
+        @inject("IJwtServices") jwtServices: IJwtServices,
+        teamRepo: TeamRepository,
+        nodeMailerServices: NodeMailerServices,
+        spaceService: SpaceRepository
 
     ) {
         this.teamRepo = teamRepo;
         this.jwtServices = jwtServices;
-        this.userService = userService;
+        // this.userService = userService;
         this.nodeMailerServices = nodeMailerServices
         this.spaceService = spaceService;
 
@@ -50,14 +67,9 @@ export default class TeamServices {
         }
     }
 
-    async create(userId: number, data: Partial<ITeam>) {
+    async create(createTeamDto: CreateTeamDto) {
         try {
-
-
-            return await this.teamRepo.create({
-                ...data,
-                userId
-            });
+            return await this.teamRepo.create(createTeamDto);
         } catch (error) {
             throw error;
         }
@@ -113,7 +125,8 @@ export default class TeamServices {
 
             if (member) throw setError(400, "you already jointed")
 
-            return await this.create(userId, {
+            return await this.create({
+                userId,
                 space: data.spaceId,
                 role: Role.MEMBER
             })
@@ -141,7 +154,8 @@ export default class TeamServices {
 
             if (member) throw setError(400, "you already jointed")
 
-            return await this.create(userId, {
+            return await this.create({
+                userId,
                 space: data.spaceId,
                 role: Role.MEMBER
             })
@@ -161,7 +175,7 @@ export default class TeamServices {
 
     async remove(id: number) {
         try {
-            return await this.teamRepo.delete(id)
+            await this.teamRepo.delete(id)
         } catch (error) {
             throw error
         }
@@ -173,7 +187,9 @@ export default class TeamServices {
 
             if (!member || member.userId !== userId || member.role === Role.OWNER) throw setError(403, "Forbidden");
 
-            return await this.teamRepo.delete(id)
+            await this.teamRepo.delete(id)
+
+            return;
         } catch (error) {
             throw error
         }
@@ -181,3 +197,7 @@ export default class TeamServices {
 }
 
 
+container.register<ITeamServices>("ITeamServices", { useClass: TeamServices });
+const teamServices = container.resolve(TeamServices);
+
+export default teamServices;

@@ -2,21 +2,21 @@ import Controller, { APIRoute } from "../app/controller";
 import { Request, Response, NextFunction } from "express";
 import routes from "../route/_team.routes";
 import { Inject } from "typedi";
-import TeamServices from "../services/team.service";
+import { ITeamServices } from "../services/team.service";
 import SpaceServices from "../services/space.services";
 import ProjectServices from "../services/project.services";
 
 
 export default class TeamController extends Controller {
     protected routes: APIRoute[];
-    private readonly teamServices: TeamServices
+    private readonly teamServices: ITeamServices
     private readonly spaceService: SpaceServices;
     private readonly projectService: ProjectServices
 
 
     constructor(
         path: string,
-        @Inject() teamServices: TeamServices,
+        @Inject() teamServices: ITeamServices,
         @Inject() spaceService: SpaceServices,
         @Inject() projectService: ProjectServices
 

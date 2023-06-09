@@ -6,7 +6,6 @@ import Container, { Inject, Service } from "typedi";
 import { setError } from '../utils/error-format';
 import TeamServices from './team.service';
 import AssigneeServices from './assignee.services';
-import ActivityServices from './activity.services';
 import ProjectServices from './project.services';
 import TaskAttachmentServices from './task_attachments.services';
 import StorageService from './storage.services';
@@ -80,7 +79,7 @@ export default class TaskServices {
 
 
             if (data?.memberId) {
-                const { assign } = await this.assign({
+                const { assign } = await this.assigneeServices.assign({
                     taskId: task.id,
                     memberId: data.memberId
                 })
@@ -240,46 +239,4 @@ export default class TaskServices {
             throw error;
         }
     }
-
-    async assign(data: Partial<IAssignee>) {
-        try {
-
-            let assign = await this.assigneeServices.findOne({
-                taskId: data.taskId,
-            });
-
-            if (assign) throw setError(400, `task is already assign to ${assign.username}`);
-
-            const member = await this.teamService.findOne(data.memberId!);
-
-            const task = await this.taskRepo.qb().where("id", "=", data.taskId!).first();
-
-            if (!member || member.space !== task?.spaceId) throw setError(400, "can't assign the task for this user");
-
-            assign = await this.assigneeServices.crate(data);
-
-            return { assign, member };
-
-        } catch (error) {
-            throw error;
-        }
-    }
-
-    async unAssign(assignmentId: number) {
-        try {
-
-            const assign = await this.assigneeServices.findOne(assignmentId);
-
-            await this.assigneeServices.delete(assignmentId)
-
-            return assign
-
-            return;
-
-        } catch (error) {
-            throw error;
-        }
-    }
-
-
 }

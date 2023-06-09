@@ -1,8 +1,9 @@
-import Controller, { APIRoute, Methods } from '../app/controller';
+import { APIRoute, Methods } from '../app/controller';
 import { updateUserSchema } from '../utils/_user-validation-schema';
 import validation from "../middleware/validation.middleware"
+import { IUserController } from '../controllers/user.controllers';
 
-const routes: (controller: Controller) => APIRoute[] = (controller: any) => {
+const routes: (controller: IUserController) => APIRoute[] = (controller: IUserController) => {
 
     const r: APIRoute[] = [
         {
