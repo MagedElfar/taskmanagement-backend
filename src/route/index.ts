@@ -1,6 +1,7 @@
 import { container } from 'tsyringe';
 import Controller from "../app/controller";
 import AuthController from "../controllers/auth.controllers";
+import PasswordController from '../controllers/password.controllers';
 import ProfileController from '../controllers/profile.controllers';
 import SpaceController from '../controllers/space.controllers';
 import UserController from '../controllers/user.controllers';
@@ -15,12 +16,10 @@ const routes: Controller[] = [
 
     container.resolve(ProfileController),
 
-    container.resolve(SpaceController)
+    container.resolve(SpaceController),
 
-    // new PasswordController(
-    //     "/password",
-    //     Container.get(PasswordServices)
-    // ),
+    container.resolve(PasswordController)
+
 
     // new MediaController(
     //     "/media",

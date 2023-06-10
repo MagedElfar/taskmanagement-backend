@@ -1,17 +1,16 @@
-import { CreateTeamDto } from './../dto/team.dto';
+import { CreateTeamDto, FindTeamDto } from './../dto/team.dto';
 import { TeamRepository, ITeam, Role } from './../model/team.model';
 import { setError } from '../utils/error-format';
 import { IUserServices } from './user.services';
 import { IJwtServices } from './jwt.services';
-import NodeMailerServices from './nodemailer.services';
+// import NodeMailerServices from './nodemailer.services';
 import { SpaceRepository } from '../model/space.model';
 import { autoInjectable, container, inject } from 'tsyringe';
+import { Knex } from 'knex';
 
 export interface ITeamServices {
-    find(data: Partial<ITeam>, querySearch: { limit?: number, page?: number }): Promise<{
-        count: number,
-        team: ITeam[]
-    }>;
+    teamQueryServices(): Knex.QueryBuilder;
+    find(findTeamDto: FindTeamDto): Promise<{ count: number, team: ITeam[] }>;
     findOne(data: Partial<ITeam> | number): Promise<ITeam>;
     create(createTeamDto: CreateTeamDto): Promise<ITeam>;
     sendInvitation(senderName: string, email: string, spaceId: number): Promise<void>;
@@ -29,20 +28,20 @@ export class TeamServices implements ITeamServices {
     // private readonly userService: IUserServices;
     private readonly spaceService: SpaceRepository;
     private readonly jwtServices: IJwtServices;
-    private readonly nodeMailerServices: NodeMailerServices
+    // private readonly nodeMailerServices: NodeMailerServices
 
     constructor(
         @inject("IUserServices") private userService: IUserServices,
         @inject("IJwtServices") jwtServices: IJwtServices,
         teamRepo: TeamRepository,
-        nodeMailerServices: NodeMailerServices,
+        // nodeMailerServices: NodeMailerServices,
         spaceService: SpaceRepository
 
     ) {
         this.teamRepo = teamRepo;
         this.jwtServices = jwtServices;
         // this.userService = userService;
-        this.nodeMailerServices = nodeMailerServices
+        // this.nodeMailerServices = nodeMailerServices
         this.spaceService = spaceService;
 
     }
@@ -51,9 +50,10 @@ export class TeamServices implements ITeamServices {
         return this.teamRepo.qb()
     }
 
-    async find(data: Partial<ITeam>, querySearch: { limit?: number, page?: number }) {
+    async find(findTeamDto: FindTeamDto) {
+        const { space, ...querySearch } = findTeamDto
         try {
-            return await this.teamRepo.find(data, querySearch)
+            return await this.teamRepo.find({ space }, querySearch)
         } catch (error) {
             throw error
         }
@@ -100,13 +100,13 @@ export class TeamServices implements ITeamServices {
                 redirectUrl = "signup"
             }
 
-            await this.nodeMailerServices.sendJoinTeamInvitation(
-                token,
-                senderName,
-                space.name,
-                email,
-                redirectUrl
-            )
+            // await this.nodeMailerServices.sendJoinTeamInvitation(
+            //     token,
+            //     senderName,
+            //     space.name,
+            //     email,
+            //     redirectUrl
+            // )
 
         } catch (error) {
             throw error

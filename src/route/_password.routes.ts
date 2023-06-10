@@ -1,9 +1,10 @@
-import Controller, { APIRoute, Methods } from '../app/controller';
+import { APIRoute, Methods } from '../app/controller';
 import { changePasswordRestSchema } from '../utils/_user-validation-schema';
 import validation from "../middleware/validation.middleware"
 import { forgetPasswordRestSchema, sendForgetPasswordLinkSchema } from '../utils/_aut-validation-schema';
+import { IPasswordController } from '../controllers/password.controllers';
 
-const routes: (controller: Controller) => APIRoute[] = (controller: any) => {
+const routes: (controller: IPasswordController) => APIRoute[] = (controller: IPasswordController) => {
 
     const r: APIRoute[] = [
         {

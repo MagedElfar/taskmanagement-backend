@@ -1,9 +1,9 @@
 import Controller, { APIRoute } from "../app/controller";
 import { Request, Response, NextFunction } from "express";
 import routes from "../route/_space.routes";
-import { ISpaceServices } from "../services/space.services";
-import { IProjectServices } from "../services/project.services";
-import { ITeamServices } from "../services/team.service";
+import { ISpaceServices, SpaceServices } from "../services/space.services";
+import { IProjectServices, ProjectServices } from "../services/project.services";
+import { ITeamServices, TeamServices } from "../services/team.service";
 import { autoInjectable, inject } from "tsyringe";
 
 export interface ISpaceController {
@@ -24,9 +24,9 @@ export default class SpaceController extends Controller implements ISpaceControl
 
 
     constructor(
-        @inject("ISpaceServices") spaceServices: ISpaceServices,
-        @inject("IProjectServices") projectServices: IProjectServices,
-        @inject("ITeamServices") teamServices: ITeamServices
+        @inject(SpaceServices) spaceServices: ISpaceServices,
+        @inject(ProjectServices) projectServices: IProjectServices,
+        @inject(TeamServices) teamServices: ITeamServices
     ) {
         super("/spaces");
         this.routes = routes(this);
@@ -67,7 +67,7 @@ export default class SpaceController extends Controller implements ISpaceControl
 
             const space = await this.spaceServices.findOne(+id);
 
-            const { team } = await this.teamServices.find({ space: +id! }, {})
+            const { team } = await this.teamServices.find({ space: +id! })
 
             const { projects } = await this.projectServices._find(+id)
 
@@ -108,7 +108,7 @@ export default class SpaceController extends Controller implements ISpaceControl
                 })
             } else {
                 const space = spaces[0];
-                const { team } = await this.teamServices.find({ space: space.id }, {})
+                const { team } = await this.teamServices.find({ space: space.id })
 
                 const { projects } = await this.projectServices._find(space.id)
 
@@ -139,7 +139,7 @@ export default class SpaceController extends Controller implements ISpaceControl
                 ...req.body
             })
 
-            const { team } = await this.teamServices.find({ space: space.id }, {})
+            const { team } = await this.teamServices.find({ space: space.id })
 
             super.setResponseSuccess({
                 res,

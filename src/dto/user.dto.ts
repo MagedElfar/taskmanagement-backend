@@ -12,6 +12,7 @@ export class CreateUsersDto {
 
 export class UpdateUsersDto {
     userId: number;
-    email: string;
-    username: string;
+    email?: string;
+    username?: string;
+    password?: string
 }

@@ -1,22 +1,27 @@
-import { Inject, Service } from "typedi";
 import { setError } from '../utils/error-format';
 import * as bcrypt from "bcrypt";
-import UserServices from './user.services';
-import TokenHelper from './jwt.services';
-import EmailServices from "./email.services";
+import { IUserServices } from './user.services';
+import { IJwtServices } from './jwt.services';
+import { IEmailServices, NodeMailerServices } from "./email.services";
+import { autoInjectable, container, inject } from "tsyringe";
 
+export interface IPasswordServices {
+    changePassword(userId: number, data: { password: string, new_password: string }): Promise<void>;
+    sendForgetPasswordLink(email: string): Promise<void>;
+    forgetPasswordRest(token: string, password: string): Promise<void>
+}
 
-@Service()
-export default class PasswordServices {
-    private readonly userServices: UserServices;
-    private readonly emailServices: EmailServices;
-    private readonly tokenHelper: TokenHelper;
+@autoInjectable()
+export class PasswordServices implements IPasswordServices {
+    private readonly userServices: IUserServices;
+    private readonly emailServices: IEmailServices;
+    private readonly tokenHelper: IJwtServices;
 
 
     constructor(
-        @Inject() userServices: UserServices,
-        @Inject() emailServices: EmailServices,
-        @Inject() tokenHelper: TokenHelper,
+        @inject("IUserServices") userServices: IUserServices,
+        @inject(NodeMailerServices) emailServices: IEmailServices,
+        @inject("IJwtServices") tokenHelper: IJwtServices,
 
     ) {
         this.userServices = userServices;
@@ -40,7 +45,10 @@ export default class PasswordServices {
             const newPassword = await bcrypt.hash(data.new_password, 10);
 
 
-            await this.userServices.update(userId, { password: newPassword });
+            await this.userServices.update({
+                userId,
+                password: newPassword
+            });
 
             return;
 
@@ -57,7 +65,7 @@ export default class PasswordServices {
 
             const token = this.tokenHelper.newTokenSign({ id: user.id }, "15m");
 
-            await this.emailServices.forgetPasswordMail(token, email)
+            await this.emailServices.sendForgetPasswordMail(email, token)
 
             return;
         } catch (error) {
@@ -71,7 +79,10 @@ export default class PasswordServices {
 
             const newPassword = await bcrypt.hash(password, 10);
 
-            await this.userServices.update(data.id, { password: newPassword });
+            await this.userServices.update({
+                userId: data.id,
+                password: newPassword
+            });
 
             return;
 
@@ -80,3 +91,5 @@ export default class PasswordServices {
         }
     }
 }
+
+container.register("IPasswordServices", { useClass: PasswordServices })

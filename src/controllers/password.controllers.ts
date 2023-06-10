@@ -1,19 +1,25 @@
 import Controller, { APIRoute } from "../app/controller";
 import { Request, Response, NextFunction } from "express";
 import routes from "../route/_password.routes";
-import { Inject } from "typedi";
-import PasswordServices from "../services/password.services";
+import { IPasswordServices, PasswordServices } from "../services/password.services";
+import { autoInjectable, inject } from "tsyringe";
 
+export interface IPasswordController {
+    changePasswordHandler(req: Request, res: Response, next: NextFunction): Promise<void>;
+    sendForgetPasswordMailHandler(req: Request, res: Response, next: NextFunction): Promise<void>;
+    forgetPasswordHandler(req: Request, res: Response, next: NextFunction): Promise<void>;
+}
+
+@autoInjectable()
 export default class PasswordController extends Controller {
     protected routes: APIRoute[];
-    private readonly passwordServices: PasswordServices;
+    private readonly passwordServices: IPasswordServices;
 
 
     constructor(
-        path: string,
-        @Inject() passwordServices: PasswordServices
+        @inject(PasswordServices) passwordServices: IPasswordServices
     ) {
-        super(path);
+        super("/password");
         this.routes = routes(this);
         this.passwordServices = passwordServices
     }
