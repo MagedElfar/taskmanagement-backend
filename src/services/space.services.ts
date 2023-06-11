@@ -95,3 +95,7 @@ export class SpaceServices implements ISpaceServices {
 }
 
 container.register("ISpaceServices", { useClass: SpaceServices });
+
+const spaceService = container.resolve(SpaceServices);
+
+export default spaceService

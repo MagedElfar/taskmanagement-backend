@@ -1,7 +1,7 @@
 import Controller, { APIRoute } from "../app/controller";
 import { Request, Response, NextFunction } from "express"
 import routes from "../route/_auth.routes";
-import AuthServices, { InviteAuthServices, LocalAuthServices } from "../services/auth.services";
+import authServicesFactory, { AuthServicesFactory } from "../services/auth.services";
 import config from "../config";
 import { autoInjectable } from "tsyringe";
 
@@ -16,24 +16,18 @@ export interface IAuthController {
 export default class AuthController extends Controller implements IAuthController {
 
     protected routes: APIRoute[] = routes(this);
-    private readonly authServices: AuthServices;
-    private readonly inviteAuthServices: AuthServices
+    private readonly authServices: AuthServicesFactory = authServicesFactory;
 
 
-    constructor(
-        authServices: LocalAuthServices,
-        inviteAuthServices: InviteAuthServices
-    ) {
+    constructor() {
         super("");
-        this.authServices = authServices;
-        this.inviteAuthServices = inviteAuthServices
     }
 
     async loginHandler(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
 
 
-            const user = await this.authServices.login(req.body);
+            const user = await this.authServices.createServices().login(req.body);
 
             res.cookie("refresh_token", user.refreshToken, config.cookie.option)
 
@@ -51,19 +45,12 @@ export default class AuthController extends Controller implements IAuthControlle
     async signupHandler(req: Request, res: Response, next: NextFunction) {
         try {
 
-            const { token } = req.query
+            const { token } = req.query;
 
-
-            let user;
-
-            if (token) {
-                user = await this.inviteAuthServices.signup({
-                    ...req.body,
-                    token: token?.toString()
-                })
-            } else {
-                user = await this.authServices.signup(req.body)
-            }
+            const user = await this.authServices.createServices(token).signup({
+                ...req.body,
+                token: token?.toString()
+            })
 
             res.cookie("refresh_token", user.refreshToken, config.cookie.option)
 
@@ -82,7 +69,7 @@ export default class AuthController extends Controller implements IAuthControlle
     async logoutHandler(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
 
-            await this.authServices.logout(req.refreshToken!);
+            await this.authServices.createServices().logout(req.refreshToken!);
 
             super.setResponseSuccess({
                 res,
@@ -97,7 +84,7 @@ export default class AuthController extends Controller implements IAuthControlle
     async refreshTokenHandler(req: Request, res: Response, next: NextFunction) {
         try {
 
-            const token = await this.authServices.refreshToken(req.refreshToken!)
+            const token = await this.authServices.createServices().refreshToken(req.refreshToken!)
 
             res.cookie("refresh_token", token.refreshToken, config.cookie.option)
 

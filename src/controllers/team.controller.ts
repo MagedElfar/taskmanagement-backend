@@ -1,31 +1,33 @@
+import { TeamServices } from './../services/team.service';
 import Controller, { APIRoute } from "../app/controller";
 import { Request, Response, NextFunction } from "express";
 import routes from "../route/_team.routes";
-import { Inject } from "typedi";
 import { ITeamServices } from "../services/team.service";
-import SpaceServices from "../services/space.services";
-import ProjectServices from "../services/project.services";
+import { autoInjectable, inject } from "tsyringe";
 
+export interface ITeamController {
+    getTeamHandler(req: Request, res: Response, next: NextFunction): Promise<void>;
+    updateRoleHandler(req: Request, res: Response, next: NextFunction): Promise<void>;
+    removeMemberHandler(req: Request, res: Response, next: NextFunction): Promise<void>;
+    leaveTeamHandler(req: Request, res: Response, next: NextFunction): Promise<void>
 
-export default class TeamController extends Controller {
+}
+
+@autoInjectable()
+export default class TeamController extends Controller implements ITeamController {
     protected routes: APIRoute[];
     private readonly teamServices: ITeamServices
-    private readonly spaceService: SpaceServices;
-    private readonly projectService: ProjectServices
+
 
 
     constructor(
-        path: string,
-        @Inject() teamServices: ITeamServices,
-        @Inject() spaceService: SpaceServices,
-        @Inject() projectService: ProjectServices
+        @inject(TeamServices) teamServices: ITeamServices,
+
 
     ) {
-        super(path);
+        super("/teams");
         this.routes = routes(this);
         this.teamServices = teamServices;
-        this.spaceService = spaceService;
-        this.projectService = projectService
     }
 
     async getTeamHandler(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -33,7 +35,8 @@ export default class TeamController extends Controller {
 
             const { limit = 10, page = 1, space } = req.query
 
-            const data = await this.teamServices.find({ space: +space! }, {
+            const data = await this.teamServices.find({
+                space: +space!,
                 limit: +limit,
                 page: +page,
             });
@@ -42,59 +45,6 @@ export default class TeamController extends Controller {
                 res,
                 status: 200,
                 data: { data }
-            })
-
-        } catch (error) {
-            next(error)
-        }
-    };
-
-
-    async sendInvitationHandler(req: Request, res: Response, next: NextFunction): Promise<void> {
-        try {
-
-            const user = req.user;
-
-            await this.teamServices.sendInvitation(
-                user?.username!,
-                req.body.email,
-                req.body.space
-            )
-
-            super.setResponseSuccess({
-                res,
-                status: 200,
-                message: "invitation mail is sent"
-            })
-
-        } catch (error) {
-            next(error)
-        }
-    };
-
-    async addToTeamHandler(req: Request, res: Response, next: NextFunction): Promise<void> {
-        try {
-
-            const userId = req.user?.id
-            const { token } = req.query
-
-            const member = await this.teamServices.acceptInvitation(token?.toString()!, userId!)
-
-            const space = await this.spaceService.findOne(member.space);
-
-            const { team } = await this.teamServices.find({ space: member.space }, {})
-
-            const { projects } = await this.projectService._find(space.id)
-
-            super.setResponseSuccess({
-                res,
-                status: 201,
-                data: {
-                    member,
-                    space,
-                    team,
-                    projects
-                }
             })
 
         } catch (error) {

@@ -96,96 +96,96 @@ class SpacePermission extends Permissions {
     }
 }
 
-// class TeamPermission extends Permissions {
+class TeamPermission extends Permissions {
 
-//     private getSpaceId = async (req: Request) => {
-//         try {
-//             if (req.params?.id) {
-//                 const memberId = req.params?.id
-//                 const member: ITeam = await this
-//                     .teamService.teamQueryServices()
-//                     .where("id", "=", memberId)
-//                     .andWhereNot("role", "=", Role.OWNER)
-//                     .first();
+    private getSpaceId = async (req: Request) => {
+        try {
+            if (req.params?.id) {
+                const memberId = req.params?.id
+                const member: ITeam = await this
+                    .teamService.teamQueryServices()
+                    .where("id", "=", memberId)
+                    .andWhereNot("role", "=", Role.OWNER)
+                    .first();
 
-//                 if (!member) throw setError(403, "Forbidden");
-//                 return member.space
-//             } else {
+                if (!member) throw setError(403, "Forbidden");
+                return member.space
+            } else {
 
-//                 return req.body.space
-//             }
-//         } catch (error) {
-//             throw error;
-//         }
-//     }
+                return req.body.space
+            }
+        } catch (error) {
+            throw error;
+        }
+    }
 
-//     ownerPermissions = async (req: Request, res: Response, next: NextFunction) => {
-//         try {
-
-
-//             const userId = req.user?.id;
-//             const space = await this.getSpaceId(req)
+    ownerPermissions = async (req: Request, res: Response, next: NextFunction) => {
+        try {
 
 
-//             const member: ITeam = await this
-//                 .teamService.teamQueryServices()
-//                 .where({ space, userId })
-//                 .andWhere("role", "=", Role.OWNER)
-//                 .first();
+            const userId = req.user?.id;
+            const space = await this.getSpaceId(req)
 
-//             if (!member) throw setError(403, "Forbidden");
 
-//             next()
+            const member: ITeam = await this
+                .teamService.teamQueryServices()
+                .where({ space, userId })
+                .andWhere("role", "=", Role.OWNER)
+                .first();
 
-//         } catch (error) {
-//             next(error)
-//         }
-//     }
+            if (!member) throw setError(403, "Forbidden");
 
-//     adminPermissions = async (req: Request, res: Response, next: NextFunction) => {
-//         try {
-//             const userId = req.user?.id;
+            next()
 
-//             const space = await this.getSpaceId(req);
+        } catch (error) {
+            next(error)
+        }
+    }
 
-//             const member: ITeam = await this
-//                 .teamService.teamQueryServices()
-//                 .where({ space, userId })
-//                 .andWhere((q) => {
-//                     q.where("role", "=", Role.OWNER)
-//                         .orWhere("role", "=", Role.ADMIN)
-//                 })
-//                 .first();
+    adminPermissions = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const userId = req.user?.id;
 
-//             if (!member) throw setError(403, "Forbidden");
+            const space = await this.getSpaceId(req);
 
-//             next()
+            const member: ITeam = await this
+                .teamService.teamQueryServices()
+                .where({ space, userId })
+                .andWhere((q) => {
+                    q.where("role", "=", Role.OWNER)
+                        .orWhere("role", "=", Role.ADMIN)
+                })
+                .first();
 
-//         } catch (error) {
-//             next(error)
-//         }
-//     }
+            if (!member) throw setError(403, "Forbidden");
 
-//     memberPermissions = async (req: Request, res: Response, next: NextFunction) => {
-//         try {
-//             const userId = req.user?.id;
+            next()
 
-//             const space = req.query?.space || await this.getSpaceId(req)
+        } catch (error) {
+            next(error)
+        }
+    }
 
-//             const member: ITeam = await this
-//                 .teamService.teamQueryServices()
-//                 .where({ space, userId })
-//                 .first()
+    memberPermissions = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const userId = req.user?.id;
 
-//             if (!member) throw setError(403, "Forbidden");
+            const space = req.query?.space || await this.getSpaceId(req)
 
-//             next()
+            const member: ITeam = await this
+                .teamService.teamQueryServices()
+                .where({ space, userId })
+                .first()
 
-//         } catch (error) {
-//             next(error)
-//         }
-//     }
-// }
+            if (!member) throw setError(403, "Forbidden");
+
+            next()
+
+        } catch (error) {
+            next(error)
+        }
+    }
+}
 
 // class TaskPermission extends Permissions {
 
@@ -475,8 +475,8 @@ class SpacePermission extends Permissions {
 class PermissionsFactory {
     getPermissions(term: string): Permissions {
         switch (term) {
-            // case "teams":
-            //     return new TeamPermission();
+            case "teams":
+                return new TeamPermission();
 
             // case "tasks":
             //     return new TaskPermission();

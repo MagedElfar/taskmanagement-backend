@@ -1,12 +1,12 @@
 import { container } from 'tsyringe';
 import Controller from "../app/controller";
 import AuthController from "../controllers/auth.controllers";
+import InvitationController from '../controllers/invitation.controllers';
 import PasswordController from '../controllers/password.controllers';
 import ProfileController from '../controllers/profile.controllers';
 import SpaceController from '../controllers/space.controllers';
+import TeamController from '../controllers/team.controller';
 import UserController from '../controllers/user.controllers';
-
-
 
 const routes: Controller[] = [
 
@@ -18,7 +18,11 @@ const routes: Controller[] = [
 
     container.resolve(SpaceController),
 
-    container.resolve(PasswordController)
+    container.resolve(PasswordController),
+
+    container.resolve(TeamController),
+
+    container.resolve(InvitationController)
 
 
     // new MediaController(
@@ -31,13 +35,6 @@ const routes: Controller[] = [
     //     "/reports",
     //     Container.get(ReportServices)
     // )
-
-    // new TeamController(
-    //     "/teams",
-    //     Container.get(TeamServices),
-    //     Container.get(SpaceServices),
-    //     Container.get(ProjectServices)
-    // ),
 
     // new TaskController(
     //     "/tasks",

@@ -1,32 +1,31 @@
+import { InvitationServices, newUserInvitation } from './Invitation.services';
 import { setError } from "../utils/error-format";
 import userService, { IUserServices } from "./user.services";
 import * as bcrypt from "bcrypt";
 import jwtServices, { IJwtServices } from './jwt.services';
 import refreshTokenServices, { IRefreshTokenServices } from "./refreshTokenList.services";
-import teamServices, { ITeamServices } from "./team.service";
 import { LoginDto, SignupDto } from "../dto/auth.dto";
-import { autoInjectable } from "tsyringe";
+import { autoInjectable, container, inject } from "tsyringe";
 
-export default abstract class AuthServices {
+export abstract class AuthServices {
     protected readonly userService: IUserServices;
     protected readonly refreshTokenServices: IRefreshTokenServices;
     protected readonly tokenHelper: IJwtServices;
-    protected readonly teamServices: ITeamServices;
 
     constructor(
         userService: IUserServices,
         refreshTokenServices: IRefreshTokenServices,
         tokenHelper: IJwtServices,
-        teamServices: ITeamServices,
     ) {
         this.userService = userService;
         this.refreshTokenServices = refreshTokenServices;
         this.tokenHelper = tokenHelper;
-        this.teamServices = teamServices
     }
 
     async signup(signupDto: SignupDto) {
         try {
+
+            const { token, ...signupData } = signupDto
 
             let isExist = await this.userService.isExist({ username: signupDto.username });
 
@@ -39,7 +38,7 @@ export default abstract class AuthServices {
             const hashedPassword = await bcrypt.hash(signupDto.password, 10);
 
             const user = await this.userService.create({
-                ...signupDto,
+                ...signupData,
                 password: hashedPassword
             })
 
@@ -145,13 +144,16 @@ export default abstract class AuthServices {
 
 @autoInjectable()
 export class InviteAuthServices extends AuthServices {
+    protected readonly invitationServices: InvitationServices;
+
     constructor() {
         super(
             userService,
             refreshTokenServices,
-            jwtServices,
-            teamServices,
+            jwtServices
         )
+
+        this.invitationServices = newUserInvitation
     }
 
     async signup(signupDto: SignupDto) {
@@ -173,7 +175,7 @@ export class InviteAuthServices extends AuthServices {
             })
 
             id = userData.user.id
-            await this.teamServices.acceptNewUserInvitation(token!, userData.user.id);
+            await this.invitationServices.acceptInvitation(token!, userData.user.id);
 
             return userData;
 
@@ -191,8 +193,22 @@ export class LocalAuthServices extends AuthServices {
             userService,
             refreshTokenServices,
             jwtServices,
-            teamServices,
         )
     }
 }
 
+
+const inviteAuthServices = container.resolve(InviteAuthServices);
+const localAuthServices = container.resolve(LocalAuthServices);
+
+export class AuthServicesFactory {
+    constructor() { }
+
+    createServices(token?: any): AuthServices {
+        if (token) return inviteAuthServices
+
+        return localAuthServices
+    }
+}
+
+export default new AuthServicesFactory()
